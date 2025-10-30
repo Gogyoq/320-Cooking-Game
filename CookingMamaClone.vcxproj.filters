@@ -19,15 +19,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="frameworks\lib\SDL3.dll" />
-    <None Include="frameworks\lib\SDL3_image.pdb" />
-    <None Include="frameworks\lib\SDL3_image.dll" />
-    <None Include="frameworks\lib\SDL3.pdb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="frameworks\lib\SDL3_test.lib" />
-    <Library Include="frameworks\lib\SDL3_image.lib" />
-    <Library Include="frameworks\lib\SDL3.lib" />
-  </ItemGroup>
 </Project>
