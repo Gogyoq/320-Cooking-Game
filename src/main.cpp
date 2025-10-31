@@ -11,6 +11,11 @@ struct SDLState {
 	int width, height, logW, logH;
 };
 
+enum class GameState {
+	MAIN_MENU,
+	PLAYING
+};
+
 bool initialize(SDLState& state);
 void cleanup(SDLState &state);
 
@@ -26,16 +31,27 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
+	GameState gameState = GameState::PLAYING;
+
 	//load game assets
 
 	//setup game data
 	const bool* keys = SDL_GetKeyboardState(nullptr);
 	float playerX = 100;
 	float playerY = 100;
+	
+	uint64_t prevTime = SDL_GetTicks();
+	int fps = 60;
+	float frameInterval = 1000.0f / fps;
 
 	//start the game loop
 	bool running = true;
 	while (running) {
+		uint64_t nowTime = SDL_GetTicks();
+		float deltaTime = nowTime - prevTime;
+		prevTime = nowTime;
+		float deltaTimeMultiplier = deltaTime / frameInterval;
+
 		SDL_Event event{ 0 };
 		while (SDL_PollEvent(&event)) {
 
@@ -46,33 +62,37 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		//move around (temporary for example purposes)
-		float moveSpeed = 0.1f;
-		if (keys[SDL_SCANCODE_A])
-			playerX += -moveSpeed;
-		if (keys[SDL_SCANCODE_D])
-			playerX += moveSpeed;
-		if (keys[SDL_SCANCODE_W])
-			playerY += -moveSpeed;
-		if (keys[SDL_SCANCODE_S])
-			playerY += moveSpeed;
+		if (gameState == GameState::MAIN_MENU) {
 
-		//perform drawing commands
-		SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-		SDL_RenderClear(state.renderer);
+		}
+		else if (gameState == GameState::PLAYING) {
+			//move around (temporary for example purposes)
+			float moveSpeed = 5.0f * deltaTimeMultiplier;
+			if (keys[SDL_SCANCODE_A])
+				playerX += -moveSpeed;
+			if (keys[SDL_SCANCODE_D])
+				playerX += moveSpeed;
+			if (keys[SDL_SCANCODE_W])
+				playerY += -moveSpeed;
+			if (keys[SDL_SCANCODE_S])
+				playerY += moveSpeed;
 
-		SDL_FRect player{
-			.x = playerX,
-			.y = playerY,
-			.w = 20,
-			.h = 20
-		};
-		SDL_SetRenderDrawColor(state.renderer, 100, 100, 180, SDL_ALPHA_OPAQUE);
-		SDL_RenderFillRect(state.renderer, &player);
+			//perform drawing commands
+			SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+			SDL_RenderClear(state.renderer);
 
-		//swap buffers and present
-		SDL_RenderPresent(state.renderer);
+			SDL_FRect player{
+				.x = playerX,
+				.y = playerY,
+				.w = 20,
+				.h = 20
+			};
+			SDL_SetRenderDrawColor(state.renderer, 100, 100, 180, SDL_ALPHA_OPAQUE);
+			SDL_RenderFillRect(state.renderer, &player);
 
+			//swap buffers and present
+			SDL_RenderPresent(state.renderer);
+		}
 	}
 
 	cleanup(state);
