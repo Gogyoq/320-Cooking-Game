@@ -1,10 +1,10 @@
 # CookingMamaClone
 
 ### Setup 
-Run the project in visual studio 
+Run the project in visual studio 2022
 
-If you get a "SDL3.dll not found error"
+If you get any errors from the compiler finding libraries
 
-Copy `SDL3.dll` from frameworks/lib to x64/Debug
+Copy `SDL3.dll`, `SDL_ttf.dll` and `SDL_image.dll` from frameworks/lib to x64/Debug
 
-Run the project again and it shoudl work
+Run the project again and it should work

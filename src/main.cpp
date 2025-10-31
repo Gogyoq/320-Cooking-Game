@@ -2,19 +2,11 @@
 #include<SDL3/SDL.h>
 #include<SDL3/SDL_main.h>
 #include<SDL3_image/SDL_image.h>
+#include<SDL3_ttf/SDL_ttf.h>
+#include "menu.h"
+#include "data_structs.h"
 
 using namespace std;
-
-struct SDLState {
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	int width, height, logW, logH;
-};
-
-enum class GameState {
-	MAIN_MENU,
-	PLAYING
-};
 
 bool initialize(SDLState& state);
 void cleanup(SDLState &state);
@@ -22,77 +14,71 @@ void cleanup(SDLState &state);
 int main(int argc, char* argv[]) {
 
 	SDLState state;
-	state.width = 1600;
-	state.height = 900;
-	state.logW = 640;
-	state.logH = 320;
-
 	if (!initialize(state)) {
 		return 1;
 	}
 
-	GameState gameState = GameState::PLAYING;
-
 	//load game assets
+	Menu mainMenu(state);
 
 	//setup game data
 	const bool* keys = SDL_GetKeyboardState(nullptr);
-	float playerX = 100;
-	float playerY = 100;
-	
-	uint64_t prevTime = SDL_GetTicks();
-	int fps = 60;
-	float frameInterval = 1000.0f / fps;
+
+	const int TICKS_PER_SECOND = 50;
+	const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+	const int MAX_FRAMESKIP = 10;
+
+	uint64_t nextGameTick = SDL_GetTicks();
+	int loops;
 
 	//start the game loop
 	bool running = true;
 	while (running) {
-		uint64_t nowTime = SDL_GetTicks();
-		float deltaTime = nowTime - prevTime;
-		prevTime = nowTime;
-		float deltaTimeMultiplier = deltaTime / frameInterval;
-
+		//Event Handling
 		SDL_Event event{ 0 };
 		while (SDL_PollEvent(&event)) {
-
+			// Convert event coordinates to logical render coordinates
+			SDL_ConvertEventToRenderCoordinates(state.renderer, &event);
 			switch (event.type) {
 			case SDL_EVENT_QUIT:
 				running = false;
 				break;
 			}
+
+			if (state.gameState == GameState::MAIN_MENU) {
+				mainMenu.handleEvent(event); 
+			}
 		}
 
-		if (gameState == GameState::MAIN_MENU) {
+		//Executes TICKS_PER_SECOND times per second
+		loops = 0;
+		while (SDL_GetTicks() > nextGameTick && loops < MAX_FRAMESKIP) {
+			//Update game logic (anything not tied to visuals, eg. physics)
+			if (state.gameState == GameState::MAIN_MENU) {
+				mainMenu.update();
+			}
+			else if (state.gameState == GameState::PLAYING) {
+
+			}
+			nextGameTick += SKIP_TICKS;
+			loops++;
+		}
+
+		//Game Renderering
+
+		//Set color to white and clear screen
+		SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+		SDL_RenderClear(state.renderer);
+
+		if (state.gameState == GameState::MAIN_MENU) {
+			mainMenu.render();
+		}
+		else if (state.gameState == GameState::PLAYING) {
 
 		}
-		else if (gameState == GameState::PLAYING) {
-			//move around (temporary for example purposes)
-			float moveSpeed = 5.0f * deltaTimeMultiplier;
-			if (keys[SDL_SCANCODE_A])
-				playerX += -moveSpeed;
-			if (keys[SDL_SCANCODE_D])
-				playerX += moveSpeed;
-			if (keys[SDL_SCANCODE_W])
-				playerY += -moveSpeed;
-			if (keys[SDL_SCANCODE_S])
-				playerY += moveSpeed;
 
-			//perform drawing commands
-			SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-			SDL_RenderClear(state.renderer);
-
-			SDL_FRect player{
-				.x = playerX,
-				.y = playerY,
-				.w = 20,
-				.h = 20
-			};
-			SDL_SetRenderDrawColor(state.renderer, 100, 100, 180, SDL_ALPHA_OPAQUE);
-			SDL_RenderFillRect(state.renderer, &player);
-
-			//swap buffers and present
-			SDL_RenderPresent(state.renderer);
-		}
+		//swap buffers and present
+		SDL_RenderPresent(state.renderer);;
 	}
 
 	cleanup(state);
@@ -125,6 +111,22 @@ bool initialize(SDLState& state) {
 		initSuccess = false;
 	}
 
+	//Initialize SDL_ttf
+	if (!TTF_Init()) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL_ttf", state.window);
+		cleanup(state);
+		initSuccess = false;
+	}
+
+	//Load the font
+	state.font = TTF_OpenFont("src/fonts/BloodyModes.ttf", 24);  // 24 is font size
+	if (!state.font) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL_ttf", state.window);
+		TTF_Quit();
+		cleanup(state);
+		initSuccess = false;
+	}
+
 	//Configure presentation
 	SDL_SetRenderLogicalPresentation(state.renderer, state.logW, state.logH, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 	
@@ -134,5 +136,6 @@ bool initialize(SDLState& state) {
 void cleanup(SDLState &state) {
 	SDL_DestroyRenderer(state.renderer);
 	SDL_DestroyWindow(state.window);
+	TTF_CloseFont(state.font);
 	SDL_Quit();
 }
