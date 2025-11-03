@@ -4,6 +4,7 @@
 #include<SDL3_image/SDL_image.h>
 #include<SDL3_ttf/SDL_ttf.h>
 #include "menu.h"
+#include "minigames.h"
 #include "data_structs.h"
 
 using namespace std;
@@ -20,6 +21,7 @@ int main(int argc, char* argv[]) {
 
 	//load game assets
 	Menu mainMenu(state);
+	CuttingGame cutGame(state);
 
 	//setup game data
 	const bool* keys = SDL_GetKeyboardState(nullptr);
@@ -74,7 +76,7 @@ int main(int argc, char* argv[]) {
 			mainMenu.render();
 		}
 		else if (state.gameState == GameState::PLAYING) {
-
+			cutGame.render();
 		}
 
 		//swap buffers and present
@@ -105,6 +107,7 @@ bool initialize(SDLState& state) {
 
 	//Create the renderer
 	state.renderer = SDL_CreateRenderer(state.window, nullptr);
+	SDL_SetRenderVSync(state.renderer, 1);  // Enable VSync
 	if (!state.renderer) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error creating renderer", state.window);
 		cleanup(state);
@@ -119,7 +122,7 @@ bool initialize(SDLState& state) {
 	}
 
 	//Load the font
-	state.font = TTF_OpenFont("src/fonts/BloodyModes.ttf", 24);  // 24 is font size
+	state.font = TTF_OpenFont("src/res/fonts/BloodyModes.ttf", 24);  // 24 is font size
 	if (!state.font) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL_ttf", state.window);
 		TTF_Quit();
@@ -128,7 +131,7 @@ bool initialize(SDLState& state) {
 	}
 
 	//Configure presentation
-	SDL_SetRenderLogicalPresentation(state.renderer, state.logW, state.logH, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	SDL_SetRenderLogicalPresentation(state.renderer, state.logW, state.logH, SDL_LOGICAL_PRESENTATION_OVERSCAN);
 	
 	return initSuccess;
 }

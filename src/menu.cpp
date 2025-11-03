@@ -8,9 +8,9 @@ using namespace std;
 // Menu Implementation
 Menu::Menu(SDLState& state)
     : state(state),
-    startButton(220, 80, 200, 60, "Start Game", [this]() { onStartClick(); }),
-    settingsButton(220, 160, 200, 60, "Settings", [this]() { onSettingsClick(); }),
-    exitButton(220, 240, 200, 60, "Exit", [this]() { onExitClick(); }) {
+    startButton(300, 80, 200, 60, "Start Game", [this]() { onStartClick(); }),
+    settingsButton(300, 160, 200, 60, "Settings", [this]() { onSettingsClick(); }),
+    exitButton(300, 240, 200, 60, "Exit", [this]() { onExitClick(); }) {
 }
 
 void Menu::render() {

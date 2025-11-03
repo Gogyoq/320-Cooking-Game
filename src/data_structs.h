@@ -3,12 +3,16 @@
 #include<SDL3/SDL.h>
 #include<SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <string>
+#include <vector>
 
 using namespace std;
 
 enum class GameState {
 	MAIN_MENU,
-	PLAYING
+	LEVEL_SELECT,
+	PLAYING,
+	RESULT
 };
 
 struct SDLState {
@@ -18,6 +22,29 @@ struct SDLState {
 	TTF_Font* font;
 	int width = 1600;
 	int height = 900;
-	int logW = 640;
-	int logH = 320;
+	int logW = 800;
+	int logH = 450;
 };
+
+struct Ingredient {
+    std::string name;
+    int quantity;
+    std::string unit; // "cups", "grams", etc.
+};
+
+struct CookingStep {
+    std::string action;      // "chop", "mix", "bake"
+    std::vector<std::string> ingredients;
+    float duration;          // seconds for this step
+    float perfectWindow;     // timing tolerance
+};
+
+struct Recipe {
+    std::string name;
+    std::string description;
+    int difficulty;          // 1-5 stars
+    std::vector<Ingredient> ingredients;
+    std::vector<CookingStep> steps;
+    int currentStep = 0;
+};
+

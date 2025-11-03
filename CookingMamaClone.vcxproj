@@ -19,12 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\level_manager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\menu.cpp" />
+    <ClCompile Include="src\minigames.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\data_structs.h" />
+    <ClInclude Include="src\level_manager.h" />
     <ClInclude Include="src\menu.h" />
+    <ClInclude Include="src\minigames.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
