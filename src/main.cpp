@@ -50,6 +50,9 @@ int main(int argc, char* argv[]) {
 			if (state.gameState == GameState::MAIN_MENU) {
 				mainMenu.handleEvent(event); 
 			}
+			else if (state.gameState == GameState::PLAYING) {
+				cutGame.handleEvent(event);
+			}
 		}
 
 		//Executes TICKS_PER_SECOND times per second
@@ -60,7 +63,7 @@ int main(int argc, char* argv[]) {
 				mainMenu.update();
 			}
 			else if (state.gameState == GameState::PLAYING) {
-
+				cutGame.update();
 			}
 			nextGameTick += SKIP_TICKS;
 			loops++;

@@ -18,7 +18,14 @@ public:
 	void loadTextures();
 private:
 	void cleanup();
+	void onClick();
 
 	SDLState& state;
 	unordered_map<string, SDL_Texture*> textures;
+	SDL_FRect knifeRect;
+	double angle;
+	uint64_t clickTime;
+	bool isClicked;
+	bool onCooldown;
+	const int cooldownDuration = 100;
 };
