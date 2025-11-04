@@ -4,7 +4,7 @@
 #include<SDL3_image/SDL_image.h>
 #include<SDL3_ttf/SDL_ttf.h>
 #include "menu.h"
-#include "minigames.h"
+#include "level_manager.h"
 #include "data_structs.h"
 
 using namespace std;
@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
 	//load game assets
 	Menu mainMenu(state);
-	CuttingGame cutGame(state);
+	LevelManager levelManager(state);
 
 	//setup game data
 	const bool* keys = SDL_GetKeyboardState(nullptr);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 				mainMenu.handleEvent(event); 
 			}
 			else if (state.gameState == GameState::PLAYING) {
-				cutGame.handleEvent(event);
+				levelManager.handleEvent(event);
 			}
 		}
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 				mainMenu.update();
 			}
 			else if (state.gameState == GameState::PLAYING) {
-				cutGame.update();
+				levelManager.update();
 			}
 			nextGameTick += SKIP_TICKS;
 			loops++;
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 			mainMenu.render();
 		}
 		else if (state.gameState == GameState::PLAYING) {
-			cutGame.render();
+			levelManager.render();
 		}
 
 		//swap buffers and present

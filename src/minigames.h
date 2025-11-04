@@ -7,16 +7,27 @@
 
 using namespace std;
 
-class CuttingGame {
+// Base class for all minigames
+class Minigame {
+public:
+	virtual ~Minigame() = default;
+	virtual void render() = 0;
+	virtual void update() = 0;
+	virtual void handleEvent(const SDL_Event& event) = 0;
+	virtual bool isComplete() const = 0;  // Check if minigame finished
+};
+
+class CuttingGame : public Minigame {
 public:
 	CuttingGame(SDLState& state);
+	~CuttingGame();
+	void render() override;
+	void update() override;
+	void handleEvent(const SDL_Event& event) override;
+	bool isComplete() const override;
 
-	void render();
-	void update();
-	void handleEvent(const SDL_Event& event);
-
-	void loadTextures();
 private:
+	void loadTextures();
 	void cleanup();
 	void onClick();
 

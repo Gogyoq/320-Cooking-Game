@@ -1,25 +1,30 @@
 #include <vector>
 #include <memory>
 #include "level_manager.h"
+#include "minigames.h"
 #include "data_structs.h"
+
+using namespace std;
 
 //Level Manager Implementation
 LevelManager::LevelManager(SDLState& state) 
 : state(state)
 {
     loadRecipes();
+    CuttingGame game(state);
+    currentMinigame = make_unique<CuttingGame>(state);
 }
 
 void LevelManager::render() {
-
+    currentMinigame->render();
 }
 
 void LevelManager::update() {
-
+    currentMinigame->update();
 }
 
 void LevelManager::handleEvent(const SDL_Event& event) {
-
+    currentMinigame->handleEvent(event);
 }
 
 void LevelManager::loadRecipes() {

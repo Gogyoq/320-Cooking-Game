@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "data_structs.h"
+#include "minigames.h"
 
 class LevelManager {
 public:
@@ -18,6 +19,7 @@ public:
     void handleEvent(const SDL_Event& event);
 
 private:
+    unique_ptr<Minigame> currentMinigame;
     SDLState& state;
     std::vector<Recipe> recipes;
     Recipe* currentRecipe = nullptr;

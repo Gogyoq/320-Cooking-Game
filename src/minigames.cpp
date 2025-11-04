@@ -7,15 +7,16 @@
 
 //Cutting Minigame Implementation
 CuttingGame::CuttingGame(SDLState& state)
-    : state(state), isClicked(false), onCooldown(false), angle(0), clickTime(SDL_GetTicks())
+    : state(state), isClicked(false), onCooldown(false), 
+    angle(0), clickTime(SDL_GetTicks())
 { 
 	loadTextures();
-    knifeRect = {
-        .x = 400,
-        .y = 100,
-        .w = 510,
-        .h = 300
-    };
+    knifeRect = {.x = 400, .y = 100, .w = 510, .h = 300};
+}
+
+CuttingGame::~CuttingGame()
+{
+    cleanup();
 }
 
 void CuttingGame::render() {
@@ -70,6 +71,11 @@ void CuttingGame::handleEvent(const SDL_Event& event) {
         break;
     }
 
+}
+
+bool CuttingGame::isComplete() const
+{
+    return false;
 }
 
 void CuttingGame::onClick()
