@@ -11,8 +11,14 @@ LevelManager::LevelManager(SDLState& state)
 : state(state)
 {
     loadRecipes();
-    CuttingGame game(state);
-    currentMinigame = make_unique<CuttingGame>(state);
+
+    Ingredient carrot = {
+        .name = "carrot",
+        .quantity = 1,
+        .unit = "whole"
+    };
+
+    currentMinigame = make_unique<CuttingGame>(state, carrot);
 }
 
 void LevelManager::render() {
@@ -34,16 +40,14 @@ void LevelManager::loadRecipes() {
     test.description = "Test recipe";
 
     Ingredient carrot = {
-        .name = "Carrot",
+        .name = "carrot",
         .quantity = 1,
-        .unit = "Whole"
+        .unit = "whole"
     };
-
-    test.ingredients.push_back(carrot);
 
     CookingStep cut = {
         .action = "cut",
-        .ingredients = {"Carrot"},
+        .ingredients = {carrot},
         .duration = 5.0f,
         .perfectWindow = 1.5f
     };

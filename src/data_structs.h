@@ -27,24 +27,23 @@ struct SDLState {
 };
 
 struct Ingredient {
-    std::string name;
+    string name;
     int quantity;
-    std::string unit; // "cups", "grams", etc.
+    string unit; // "cups", "grams", etc.
 };
 
 struct CookingStep {
-    std::string action;      // "chop", "mix", "bake"
-    std::vector<std::string> ingredients;
+    string action;      // "chop", "mix", "bake"
+    vector<Ingredient> ingredients;
     float duration;          // seconds for this step
     float perfectWindow;     // timing tolerance
 };
 
 struct Recipe {
-    std::string name;
-    std::string description;
+    string name;
+    string description;
     int difficulty;          // 1-5 stars
-    std::vector<Ingredient> ingredients;
-    std::vector<CookingStep> steps;
+    vector<CookingStep> steps;
     int currentStep = 0;
 };
 

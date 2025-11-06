@@ -30,6 +30,9 @@
     <ClInclude Include="src\menu.h" />
     <ClInclude Include="src\minigames.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\no_texture.png" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

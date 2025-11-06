@@ -2,16 +2,32 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
 #include <iostream>
+#include <string>
 #include "data_structs.h"
 #include "minigames.h"
 
+//Helper function to get textures easily
+static SDL_Texture* getIngrTexture(SDL_Renderer* renderer, Ingredient ingr) {
+    string filepath = "src/res/sprites/ingredients/" + ingr.name + ".png";
+    SDL_Texture* texture;
+    try {
+        texture = IMG_LoadTexture(renderer, filepath.c_str());
+    }
+    catch (int e){
+        cout << "Error loading texture: " << e;
+        texture = IMG_LoadTexture(renderer, "src/res/sprites/no_texture.png");
+    }
+    return texture;
+}
+
 //Cutting Minigame Implementation
-CuttingGame::CuttingGame(SDLState& state)
-    : state(state), isClicked(false), onCooldown(false), 
-    angle(0), clickTime(SDL_GetTicks())
+CuttingGame::CuttingGame(SDLState& state, Ingredient ingr)
+    : state(state), ingr(ingr), isClicked(false), 
+    onCooldown(false), angle(0), clickTime(SDL_GetTicks())
 { 
 	loadTextures();
     knifeRect = {.x = 400, .y = 100, .w = 510, .h = 300};
+    ingrRect = { .x = 200, .y = 100, .w = 400, .h = 200};
 }
 
 CuttingGame::~CuttingGame()
@@ -23,7 +39,7 @@ void CuttingGame::render() {
 	SDL_Renderer* renderer = state.renderer;
 
 	SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
-    //SDL_RenderTexture(renderer, textures["knife"], nullptr, &knifeRect);
+    SDL_RenderTexture(renderer, textures[ingr.name], nullptr, &ingrRect);
     SDL_RenderTextureRotated(renderer, textures["knife"], nullptr, &knifeRect, angle, nullptr, SDL_FLIP_NONE);
 }
 
@@ -86,7 +102,7 @@ void CuttingGame::onClick()
 void CuttingGame::loadTextures() {
 	textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/ai_slop.png");
     textures["knife"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/knife.png");
-    //SDL_SetTextureScaleMode(textures["knife"], scalemode)
+    textures[ingr.name] = getIngrTexture(state.renderer, ingr);
 }
 
 void CuttingGame::cleanup() {

@@ -3,9 +3,13 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <unordered_map>
+#include <vector>
 #include "data_structs.h"
 
 using namespace std;
+
+//Helper function to get textures easily
+static SDL_Texture* getIngrTexture(SDL_Renderer* renderer, Ingredient ingr);
 
 // Base class for all minigames
 class Minigame {
@@ -19,7 +23,7 @@ public:
 
 class CuttingGame : public Minigame {
 public:
-	CuttingGame(SDLState& state);
+	CuttingGame(SDLState& state, Ingredient ingr);
 	~CuttingGame();
 	void render() override;
 	void update() override;
@@ -32,8 +36,10 @@ private:
 	void onClick();
 
 	SDLState& state;
+	Ingredient ingr;
 	unordered_map<string, SDL_Texture*> textures;
 	SDL_FRect knifeRect;
+	SDL_FRect ingrRect;
 	double angle;
 	uint64_t clickTime;
 	bool isClicked;
