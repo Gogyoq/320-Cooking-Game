@@ -27,8 +27,11 @@ CuttingGame::CuttingGame(SDLState& state, Ingredient ingr)
 { 
 	loadTextures();
     knifeRect = {.x = 400, .y = 80, .w = 5, .h = 250};
-    ingrDestRect = { .x = 200, .y = 100, .w = 400, .h = 200 };
-    ingrRects.push_back(ingrDestRect);
+    Rectangles initRect{
+        .destRect = {.x = 200, .y = 100, .w = 400, .h = 200 },
+        .sourceRect = {.x = 0, .y = 0, .w = (float)textures[ingr.name]->w, .h = (float)textures[ingr.name]->h}
+    };
+    ingrRects.push_back(initRect);
 }
 
 CuttingGame::~CuttingGame()
@@ -40,13 +43,12 @@ void CuttingGame::render() {
 	SDL_Renderer* renderer = state.renderer;
 
 	SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
-    for (SDL_FRect ingrRect : ingrRects) {
-        SDL_RenderFillRect(renderer, &ingrRect);
-        //SDL_RenderTexture(renderer, textures[ingr.name], &ingrRect, &ingrRect);
+    for (Rectangles rects : ingrRects) {
+        //SDL_RenderFillRect(renderer, &ingrRect);
+        SDL_RenderTexture(renderer, textures[ingr.name], &rects.sourceRect, &rects.destRect);
     }
-    
-    //SDL_RenderFillRect(renderer, &knifeRect);
-    SDL_RenderTexture(renderer, textures["knife"], nullptr, &knifeRect);
+   
+    SDL_RenderTexture(renderer, textures["knife"], nullptr, &knifeRect); //knife is the dotted line
 }
 
 void CuttingGame::update() {
@@ -101,36 +103,93 @@ void CuttingGame::onClick() {
     bool knifeOverRect;
     bool cutMade = false;
     int index = 0;
-    SDL_FRect leftHalf;
-    SDL_FRect rightHalf;
+    SDL_FRect leftDisplayRect, rightDisplayRect;
+    SDL_FRect leftSourceRect, rightSourceRect;
+
     for (int i = 0; i < ingrRects.size(); i++) {
-        SDL_FRect rect = ingrRects[i];
+        SDL_FRect rect = ingrRects[i].destRect;
         knifeOverRect = knifeRect.x + knifeRect.w >= rect.x && knifeRect.x <= rect.x + rect.w;
+
         if (knifeOverRect) {
             cutMade = true;
             index = i;
             float cutPoint = knifeRect.x + (knifeRect.w / 2);
 
-            leftHalf = {
-                .x = rect.x - 2,
+            // Display rectangles (for positioning)
+            leftDisplayRect = {
+                .x = rect.x,
                 .y = rect.y,
                 .w = cutPoint - rect.x,
                 .h = rect.h
             };
 
-            rightHalf = {
-                .x = cutPoint + 2,
+            rightDisplayRect = {
+                .x = cutPoint,
                 .y = rect.y,
                 .w = rect.w + rect.x - cutPoint,
                 .h = rect.h
             };
+
+            // Source texture rectangles (proportional to original)
+            float originalTextureWidth = ingrRects[i].sourceRect.w;
+            float cutRatio = (cutPoint - rect.x) / rect.w;
+
+            leftSourceRect = {
+                .x = ingrRects[i].sourceRect.x,
+                .y = ingrRects[i].sourceRect.y,
+                .w = originalTextureWidth * cutRatio,
+                .h = ingrRects[i].sourceRect.h
+            };
+
+            rightSourceRect = {
+                .x = ingrRects[i].sourceRect.x + leftSourceRect.w,
+                .y = ingrRects[i].sourceRect.y,
+                .w = originalTextureWidth * (1.0f - cutRatio),
+                .h = ingrRects[i].sourceRect.h
+            };
+
+            break;
         }
     }
 
     if (cutMade) {
         ingrRects.erase(ingrRects.begin() + index);
-        ingrRects.push_back(leftHalf);
-        ingrRects.push_back(rightHalf);
+
+        Rectangles leftIngredient = {
+            .destRect = leftDisplayRect,
+            .sourceRect = leftSourceRect
+        };
+        Rectangles rightIngredient = {
+            .destRect = rightDisplayRect,
+            .sourceRect = rightSourceRect
+        };
+
+        ingrRects.insert(ingrRects.begin() + index, leftIngredient);
+        ingrRects.insert(ingrRects.begin() + index + 1, rightIngredient);
+
+        spaceRectangles();
+    }
+}
+
+void CuttingGame::spaceRectangles() {
+    if (ingrRects.empty()) return;
+
+    // Calculate total width needed
+    float totalWidth = 0.0f;
+    for (const auto& ingredient : ingrRects) {
+        totalWidth += ingredient.destRect.w;
+    }
+
+    float totalGaps = (ingrRects.size() - 1) * 5.0f;
+    float contentWidth = totalWidth + totalGaps;
+
+    float startX = (state.logW - contentWidth) / 2.0f;
+
+    // Reposition display rects only, keep texture source rects intact
+    float currentX = startX;
+    for (auto& ingredient : ingrRects) {
+        ingredient.destRect.x = currentX;
+        currentX += ingredient.destRect.w + 5.0f;
     }
 }
 

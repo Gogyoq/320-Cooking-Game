@@ -31,16 +31,21 @@ public:
 	bool isComplete() const override;
 
 private:
+	void spaceRectangles();
 	void loadTextures();
 	void cleanup();
 	void onClick();
+
+	struct Rectangles {
+		SDL_FRect destRect;
+		SDL_FRect sourceRect;
+	};
 
 	SDLState& state;
 	Ingredient ingr;
 	unordered_map<string, SDL_Texture*> textures;
 	SDL_FRect knifeRect;
-	SDL_FRect ingrDestRect;
-	vector<SDL_FRect> ingrRects;
+	vector<Rectangles> ingrRects;
 	uint64_t clickTime;
 	bool isClicked;
 	bool onCooldown;
