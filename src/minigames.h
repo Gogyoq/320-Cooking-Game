@@ -23,7 +23,7 @@ public:
 
 class CuttingGame : public Minigame { //Base your minigame off of this one
 public:
-	CuttingGame(SDLState& state, Ingredient ingr); //Will probably chnage to take a cooking step later
+	CuttingGame(SDLState& state, Ingredient ingr); //Will probably change to take a cookingStep struct later
 	~CuttingGame();
 	void render() override; 
 	void update() override;

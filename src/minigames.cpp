@@ -99,6 +99,7 @@ bool CuttingGame::isComplete() const {
     return false;
 }
 
+//This function splits the ingredient when called
 void CuttingGame::onClick() {
     bool knifeOverRect;
     bool cutMade = false;
@@ -108,7 +109,7 @@ void CuttingGame::onClick() {
 
     for (int i = 0; i < ingrRects.size(); i++) {
         SDL_FRect rect = ingrRects[i].destRect;
-        knifeOverRect = knifeRect.x + knifeRect.w >= rect.x && knifeRect.x <= rect.x + rect.w;
+        knifeOverRect = knifeRect.x >= rect.x && knifeRect.x + knifeRect.w <= rect.x + rect.w;
 
         if (knifeOverRect) {
             cutMade = true;
@@ -171,8 +172,11 @@ void CuttingGame::onClick() {
     }
 }
 
+//This is to space out each rectangle after a cut
 void CuttingGame::spaceRectangles() {
     if (ingrRects.empty()) return;
+
+    const float cutWidth = 3.0f; //Change this to alter cut width
 
     // Calculate total width needed
     float totalWidth = 0.0f;
@@ -180,7 +184,7 @@ void CuttingGame::spaceRectangles() {
         totalWidth += ingredient.destRect.w;
     }
 
-    float totalGaps = (ingrRects.size() - 1) * 5.0f;
+    float totalGaps = (ingrRects.size() - 1) * cutWidth;
     float contentWidth = totalWidth + totalGaps;
 
     float startX = (state.logW - contentWidth) / 2.0f;
@@ -189,10 +193,11 @@ void CuttingGame::spaceRectangles() {
     float currentX = startX;
     for (auto& ingredient : ingrRects) {
         ingredient.destRect.x = currentX;
-        currentX += ingredient.destRect.w + 5.0f;
+        currentX += ingredient.destRect.w + cutWidth;
     }
 }
 
+//Load textures need for minigame
 void CuttingGame::loadTextures() {
 	textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/ai_slop.png");
     textures["knife"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/dotted.png");
