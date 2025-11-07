@@ -23,7 +23,7 @@ static SDL_Texture* getIngrTexture(SDL_Renderer* renderer, Ingredient ingr) {
 //Cutting Minigame Implementation
 CuttingGame::CuttingGame(SDLState& state, Ingredient ingr)
     : state(state), ingr(ingr), isClicked(false), 
-    onCooldown(false), angle(0), clickTime(SDL_GetTicks())
+    onCooldown(false), clickTime(SDL_GetTicks())
 { 
 	loadTextures();
     knifeRect = {.x = 400, .y = 80, .w = 5, .h = 250};
