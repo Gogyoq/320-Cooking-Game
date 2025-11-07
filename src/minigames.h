@@ -40,7 +40,6 @@ private:
 	unordered_map<string, SDL_Texture*> textures;
 	SDL_FRect knifeRect;
 	SDL_FRect ingrRect;
-	double angle;
 	uint64_t clickTime;
 	bool isClicked;
 	bool onCooldown;

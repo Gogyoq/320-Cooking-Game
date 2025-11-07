@@ -26,7 +26,7 @@ CuttingGame::CuttingGame(SDLState& state, Ingredient ingr)
     onCooldown(false), angle(0), clickTime(SDL_GetTicks())
 { 
 	loadTextures();
-    knifeRect = {.x = 400, .y = 100, .w = 510, .h = 300};
+    knifeRect = {.x = 400, .y = 80, .w = 5, .h = 250};
     ingrRect = { .x = 200, .y = 100, .w = 400, .h = 200};
 }
 
@@ -40,7 +40,7 @@ void CuttingGame::render() {
 
 	SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
     SDL_RenderTexture(renderer, textures[ingr.name], nullptr, &ingrRect);
-    SDL_RenderTextureRotated(renderer, textures["knife"], nullptr, &knifeRect, angle, nullptr, SDL_FLIP_NONE);
+    SDL_RenderTexture(renderer, textures["knife"], nullptr, &knifeRect);
 }
 
 void CuttingGame::update() {
@@ -49,14 +49,13 @@ void CuttingGame::update() {
     if (isClicked && !onCooldown) {
         // This code runs once on click, only if not on cooldown
         clickTime = SDL_GetTicks();
-        angle = -30;
         onCooldown = true;
         isClicked = false;
+        onClick();
     }
 
     if (onCooldown && SDL_GetTicks() - clickTime >= cooldownDuration) {
         // Cooldown is over
-        angle = 0;
         onCooldown = false;
     }
 }
@@ -69,7 +68,6 @@ void CuttingGame::handleEvent(const SDL_Event& event) {
         mouseX = event.motion.x;
         mouseY = event.motion.y;
         knifeRect.x = mouseX - knifeRect.w/2;
-        knifeRect.y = mouseY - knifeRect.h/2;
         break;
 
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -96,12 +94,12 @@ bool CuttingGame::isComplete() const
 
 void CuttingGame::onClick()
 {
-
+    //TODO: 
 }
 
 void CuttingGame::loadTextures() {
 	textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/ai_slop.png");
-    textures["knife"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/knife.png");
+    textures["knife"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/dotted.png");
     textures[ingr.name] = getIngrTexture(state.renderer, ingr);
 }
 
