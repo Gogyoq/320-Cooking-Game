@@ -21,11 +21,11 @@ public:
 	virtual bool isComplete() const = 0;  // Check if minigame finished
 };
 
-class CuttingGame : public Minigame {
+class CuttingGame : public Minigame { //Base your minigame off of this one
 public:
 	CuttingGame(SDLState& state, Ingredient ingr);
 	~CuttingGame();
-	void render() override;
+	void render() override; 
 	void update() override;
 	void handleEvent(const SDL_Event& event) override;
 	bool isComplete() const override;
