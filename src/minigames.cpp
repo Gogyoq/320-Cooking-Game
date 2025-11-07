@@ -27,7 +27,8 @@ CuttingGame::CuttingGame(SDLState& state, Ingredient ingr)
 { 
 	loadTextures();
     knifeRect = {.x = 400, .y = 80, .w = 5, .h = 250};
-    ingrRect = { .x = 200, .y = 100, .w = 400, .h = 200};
+    ingrDestRect = { .x = 200, .y = 100, .w = 400, .h = 200 };
+    ingrRects.push_back(ingrDestRect);
 }
 
 CuttingGame::~CuttingGame()
@@ -39,7 +40,12 @@ void CuttingGame::render() {
 	SDL_Renderer* renderer = state.renderer;
 
 	SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
-    SDL_RenderTexture(renderer, textures[ingr.name], nullptr, &ingrRect);
+    for (SDL_FRect ingrRect : ingrRects) {
+        SDL_RenderFillRect(renderer, &ingrRect);
+        //SDL_RenderTexture(renderer, textures[ingr.name], &ingrRect, &ingrRect);
+    }
+    
+    //SDL_RenderFillRect(renderer, &knifeRect);
     SDL_RenderTexture(renderer, textures["knife"], nullptr, &knifeRect);
 }
 
@@ -87,14 +93,45 @@ void CuttingGame::handleEvent(const SDL_Event& event) {
 
 }
 
-bool CuttingGame::isComplete() const
-{
+bool CuttingGame::isComplete() const {
     return false;
 }
 
-void CuttingGame::onClick()
-{
-    //TODO: 
+void CuttingGame::onClick() {
+    bool knifeOverRect;
+    bool cutMade = false;
+    int index = 0;
+    SDL_FRect leftHalf;
+    SDL_FRect rightHalf;
+    for (int i = 0; i < ingrRects.size(); i++) {
+        SDL_FRect rect = ingrRects[i];
+        knifeOverRect = knifeRect.x + knifeRect.w >= rect.x && knifeRect.x <= rect.x + rect.w;
+        if (knifeOverRect) {
+            cutMade = true;
+            index = i;
+            float cutPoint = knifeRect.x + (knifeRect.w / 2);
+
+            leftHalf = {
+                .x = rect.x - 2,
+                .y = rect.y,
+                .w = cutPoint - rect.x,
+                .h = rect.h
+            };
+
+            rightHalf = {
+                .x = cutPoint + 2,
+                .y = rect.y,
+                .w = rect.w + rect.x - cutPoint,
+                .h = rect.h
+            };
+        }
+    }
+
+    if (cutMade) {
+        ingrRects.erase(ingrRects.begin() + index);
+        ingrRects.push_back(leftHalf);
+        ingrRects.push_back(rightHalf);
+    }
 }
 
 void CuttingGame::loadTextures() {

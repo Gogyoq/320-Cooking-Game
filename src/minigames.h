@@ -23,7 +23,7 @@ public:
 
 class CuttingGame : public Minigame { //Base your minigame off of this one
 public:
-	CuttingGame(SDLState& state, Ingredient ingr);
+	CuttingGame(SDLState& state, Ingredient ingr); //Will probably chnage to take a cooking step later
 	~CuttingGame();
 	void render() override; 
 	void update() override;
@@ -39,7 +39,8 @@ private:
 	Ingredient ingr;
 	unordered_map<string, SDL_Texture*> textures;
 	SDL_FRect knifeRect;
-	SDL_FRect ingrRect;
+	SDL_FRect ingrDestRect;
+	vector<SDL_FRect> ingrRects;
 	uint64_t clickTime;
 	bool isClicked;
 	bool onCooldown;
