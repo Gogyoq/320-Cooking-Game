@@ -35,7 +35,7 @@ struct Ingredient {
 struct CookingStep {
     string action;      // "chop", "mix", "bake"
     vector<Ingredient> ingredients;
-    float duration;          // seconds for this step
+    float duration;          // # of cuts/spins/seconds to complete the task. usage depends on minigame
     float perfectWindow;     // timing tolerance
 };
 
