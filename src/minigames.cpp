@@ -21,10 +21,11 @@ static SDL_Texture* getIngrTexture(SDL_Renderer* renderer, Ingredient ingr) {
 }
 
 //Cutting Minigame Implementation
-CuttingGame::CuttingGame(SDLState& state, Ingredient ingr)
-    : state(state), ingr(ingr), isClicked(false), 
+CuttingGame::CuttingGame(SDLState& state, CookingStep step)
+    : state(state), step(step), isClicked(false), 
     onCooldown(false), clickTime(SDL_GetTicks())
 { 
+    ingr = step.ingredients[0]; //Maybe update this to check if the array is empty later im too lazy
 	loadTextures();
     knifeRect = {.x = 400, .y = 80, .w = 5, .h = 250};
     Rectangles initRect{
@@ -43,8 +44,7 @@ void CuttingGame::render() {
 	SDL_Renderer* renderer = state.renderer;
 
 	SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
-    for (Rectangles rects : ingrRects) {
-        //SDL_RenderFillRect(renderer, &ingrRect);
+    for (const Rectangles& rects : ingrRects) {
         SDL_RenderTexture(renderer, textures[ingr.name], &rects.sourceRect, &rects.destRect);
     }
    

@@ -42,7 +42,7 @@ struct CookingStep {
 struct Recipe {
     string name;
     string description;
-    int difficulty;          // 1-5 stars
+    int difficulty = 0;          // 1-5 stars
     vector<CookingStep> steps;
     int currentStep = 0;
 };
