@@ -1,7 +1,8 @@
 #include <vector>
 #include <memory>
 #include "level_manager.h"
-#include "minigames.h"
+#include "minigames/minigame.h"
+#include "minigames/cutting_game.h"
 #include "data_structs.h"
 
 using namespace std;

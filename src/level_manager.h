@@ -3,7 +3,8 @@
 #include <vector>
 #include <memory>
 #include "data_structs.h"
-#include "minigames.h"
+#include "minigames/minigame.h"
+#include "minigames/cutting_game.h"
 
 class LevelManager {
 public:

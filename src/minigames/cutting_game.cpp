@@ -3,31 +3,24 @@
 #include <SDL3_image/SDL_image.h>
 #include <iostream>
 #include <string>
-#include "data_structs.h"
-#include "minigames.h"
+#include "cutting_game.h"
+#include "minigame.h"
+#include "../data_structs.h"
 
-//Helper function to get textures easily
-static SDL_Texture* getIngrTexture(SDL_Renderer* renderer, Ingredient ingr) {
-    string filepath = "src/res/sprites/ingredients/" + ingr.name + ".png";
-    SDL_Texture* texture;
-    try {
-        texture = IMG_LoadTexture(renderer, filepath.c_str());
-    }
-    catch (int e){
-        cout << "Error loading texture: " << e;
-        texture = IMG_LoadTexture(renderer, "src/res/sprites/no_texture.png");
-    }
-    return texture;
-}
+using namespace std;
 
 //Cutting Minigame Implementation
 CuttingGame::CuttingGame(SDLState& state, CookingStep step)
-    : state(state), step(step), isClicked(false), 
+    : state(state), step(step), isClicked(false),
     onCooldown(false), clickTime(SDL_GetTicks())
-{ 
+{
     ingr = step.ingredients[0]; //Maybe update this to check if the array is empty later im too lazy
-	loadTextures();
-    knifeRect = {.x = 400, .y = 80, .w = 5, .h = 250};
+
+    loadTextures(); //Load all textures for this minigame
+
+    knifeRect = { .x = 400, .y = 80, .w = 5, .h = 250 };
+    progressBar = { .x = 100, .y = 350, .w = 0, .h = 25 };
+    progressBarBG = { .x = 95, .y = 345, .w = 610, .h = 35 };
     Rectangles initRect{
         .destRect = {.x = 200, .y = 100, .w = 400, .h = 200 },
         .sourceRect = {.x = 0, .y = 0, .w = (float)textures[ingr.name]->w, .h = (float)textures[ingr.name]->h}
@@ -41,14 +34,47 @@ CuttingGame::~CuttingGame()
 }
 
 void CuttingGame::render() {
-	SDL_Renderer* renderer = state.renderer;
+    SDL_Renderer* renderer = state.renderer;
 
-	SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
+    //Render background
+    SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
+
+    //Render each cutup section of the ingredient
     for (const Rectangles& rects : ingrRects) {
         SDL_RenderTexture(renderer, textures[ingr.name], &rects.sourceRect, &rects.destRect);
     }
-   
+
+    //Render the dotted line for the knife
     SDL_RenderTexture(renderer, textures["knife"], nullptr, &knifeRect); //knife is the dotted line
+
+    //render the progress bar
+    SDL_RenderFillRect(renderer, &progressBarBG);
+    SDL_SetRenderDrawColor(renderer, 130, 170, 255, SDL_ALPHA_OPAQUE);
+    SDL_RenderFillRect(renderer, &progressBar);
+
+    //Render text
+    string text = "Cuts Remaining: " + to_string((int)(step.duration - cutsMade));
+    SDL_Color textColor = { 0, 0, 0, SDL_ALPHA_OPAQUE };
+    SDL_Surface* textSurface = TTF_RenderText_Solid(state.font, text.c_str(), 0, textColor);
+    if (textSurface) {
+        SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+
+        if (textTexture) {
+            float textW, textH;
+            SDL_GetTextureSize(textTexture, &textW, &textH);
+
+            SDL_FRect textRect = {
+                progressBarBG.x + (progressBarBG.w - textW)/2,
+                progressBarBG.y + 3,
+                textW,
+                textH
+            };
+
+            SDL_RenderTexture(renderer, textTexture, nullptr, &textRect);
+            SDL_DestroyTexture(textTexture);
+        }
+        SDL_DestroySurface(textSurface);
+    }
 }
 
 void CuttingGame::update() {
@@ -66,16 +92,18 @@ void CuttingGame::update() {
         // Cooldown is over
         onCooldown = false;
     }
+
+    updateProgress();
 }
 
 void CuttingGame::handleEvent(const SDL_Event& event) {
-	float mouseX, mouseY;
+    float mouseX, mouseY;
 
     switch (event.type) {
     case SDL_EVENT_MOUSE_MOTION:
         mouseX = event.motion.x;
         mouseY = event.motion.y;
-        knifeRect.x = mouseX - knifeRect.w/2;
+        knifeRect.x = mouseX - knifeRect.w / 2;
         break;
 
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -96,7 +124,7 @@ void CuttingGame::handleEvent(const SDL_Event& event) {
 }
 
 bool CuttingGame::isComplete() const {
-    return false;
+    return cutsMade >= step.duration;
 }
 
 //This function splits the ingredient when called
@@ -111,7 +139,7 @@ void CuttingGame::onClick() {
         SDL_FRect rect = ingrRects[i].destRect;
         knifeOverRect = knifeRect.x >= rect.x && knifeRect.x + knifeRect.w <= rect.x + rect.w;
 
-        if (knifeOverRect) {
+        if (knifeOverRect && !isComplete()) {
             cutMade = true;
             index = i;
             float cutPoint = knifeRect.x + (knifeRect.w / 2);
@@ -169,6 +197,7 @@ void CuttingGame::onClick() {
         ingrRects.insert(ingrRects.begin() + index + 1, rightIngredient);
 
         spaceRectangles();
+        cutsMade++;
     }
 }
 
@@ -197,18 +226,38 @@ void CuttingGame::spaceRectangles() {
     }
 }
 
+//Update progress based on cuts remaining
+void CuttingGame::updateProgress()
+{
+    int totalWidth = 600;
+    progressBar.w = totalWidth * (cutsMade / step.duration);
+}
+
+//Helper function to get ingredient file path, important that we follow filename conventions
+SDL_Texture* CuttingGame::getIngrTexture(SDL_Renderer* renderer, Ingredient ingr) {
+    string filepath = "src/res/sprites/ingredients/" + ingr.name + ".png";
+    SDL_Texture* texture;
+    try {
+        texture = IMG_LoadTexture(renderer, filepath.c_str());
+    }
+    catch (int e) {
+        cout << "Error loading texture: " << e;
+        texture = IMG_LoadTexture(renderer, "src/res/sprites/no_texture.png");
+    }
+    return texture;
+}
+
 //Load textures need for minigame
 void CuttingGame::loadTextures() {
-	textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/ai_slop.png");
+    textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/ai_slop.png");
     textures["knife"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/dotted.png");
     textures[ingr.name] = getIngrTexture(state.renderer, ingr);
 }
 
 void CuttingGame::cleanup() {
-	for (auto& pair : textures) {
-		SDL_DestroyTexture(pair.second);
-	}
+    for (auto& pair : textures) {
+        SDL_DestroyTexture(pair.second);
+    }
 
-	textures.clear();
+    textures.clear();
 }
-
