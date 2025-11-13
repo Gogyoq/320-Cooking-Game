@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "data_structs.h"
+#include "button.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
 
@@ -12,7 +13,8 @@ public:
 
     void loadRecipes();
     Recipe* getCurrentRecipe();
-    bool advanceStep();
+    void startRecipe();
+    void advanceStep();
     bool isRecipeComplete();
 
     void render();
@@ -20,10 +22,22 @@ public:
     void handleEvent(const SDL_Event& event);
 
 private:
+    void onSelectClick();
+    bool isCarouselAnimating() const;
+
     unique_ptr<Minigame> currentMinigame;
     SDLState& state;
     std::vector<Recipe> recipes;
     Recipe* currentRecipe = nullptr;
-    int currentRecipeIndex = 0;
+    bool recipeStarted;
+
+    //Variables for level select screen
+    Button selectButton;
+    int selectedRecipeIndex = 0;
+    float currentScrollPosition = 0.0f;  // Current visual position
+    float targetScrollPosition = 0.0f;   // Where we're scrolling to
+    const float SCROLL_SPEED = 0.15f;    // Interpolation speed (0.0-1.0)
+    const int CARD_WIDTH = 300;
+    const int CARD_SPACING = 50;
 };
 

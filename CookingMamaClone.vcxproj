@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\button.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\level_manager.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -26,6 +27,7 @@
     <ClCompile Include="src\minigames\cutting_game.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\button.h" />
     <ClInclude Include="src\data_structs.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\level_manager.h" />
