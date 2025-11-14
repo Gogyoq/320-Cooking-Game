@@ -37,7 +37,7 @@ private:
     float currentScrollPosition = 0.0f;  // Current visual position
     float targetScrollPosition = 0.0f;   // Where we're scrolling to
     const float SCROLL_SPEED = 0.15f;    // Interpolation speed (0.0-1.0)
-    const int CARD_WIDTH = 300;
-    const int CARD_SPACING = 50;
+    const float CARD_WIDTH = 300.0f;
+    const float CARD_SPACING = 50.0f;
 };
 

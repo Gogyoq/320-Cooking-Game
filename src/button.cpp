@@ -66,7 +66,7 @@ void Button::render(SDLState& state) {
     SDL_RenderFillRect(renderer, &rect);
 
     // Draw border
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderRect(renderer, &rect);
 
     // Render text

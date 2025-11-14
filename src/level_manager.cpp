@@ -27,8 +27,8 @@ void LevelManager::render() {
         SDL_RenderClear(state.renderer);
 
         //Find center of screen
-        float centerX = state.logW / 2;
-        float centerY = state.logH / 2;
+        float centerX = (float)state.logW / 2;
+        float centerY = (float)state.logH / 2;
 
         // Render each recipe card
         for (size_t i = 0; i < recipes.size(); i++) {
