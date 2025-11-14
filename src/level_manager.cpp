@@ -132,7 +132,11 @@ void LevelManager::handleEvent(const SDL_Event& event) {
                     targetScrollPosition = selectedRecipeIndex * (CARD_WIDTH + CARD_SPACING);
                 }
                 break;
+            case SDLK_ESCAPE:
+                state.gameState = GameState::MAIN_MENU;
+                break;
             }
+
         }
         // Handle mouse wheel scrolling
         else if (event.type == SDL_EVENT_MOUSE_WHEEL) {
