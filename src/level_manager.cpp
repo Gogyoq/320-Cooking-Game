@@ -3,6 +3,7 @@
 #include "level_manager.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
+#include "minigames/mixing_game.h"
 #include "data_structs.h"
 #include <iostream>
 
@@ -170,7 +171,7 @@ void LevelManager::startRecipe()
         currentMinigame = make_unique<CuttingGame>(state, recipes[0].steps[0]);
     }
     else if (action == "mix") { //Placeholders
-
+        currentMinigame = make_unique<MixingGame>(state, recipes[0].steps[0]);
     }
     else if (action == "bake") {
 
@@ -184,6 +185,28 @@ void LevelManager::advanceStep()
 }
 
 void LevelManager::loadRecipes() {
+    Recipe mixingTest;
+    mixingTest.name = "Mixing Test";
+    mixingTest.difficulty = 1;
+    mixingTest.description = "Test recipe for Mixing minigame";
+
+    Ingredient carrot = {
+        .name = "carrot",
+        .quantity = 1,
+        .unit = "whole"
+    };
+
+    CookingStep mix = {
+        .action = "mix",
+        .ingredients = {carrot},
+        .duration = 5.0f,
+        .perfectWindow = 1.5f
+    };
+
+    mixingTest.steps.push_back(mix);
+
+    recipes.push_back(mixingTest);
+
     //Replace later with JSON recipe loading 
     for (int i = 0; i < 10; i++) {
         Recipe test;

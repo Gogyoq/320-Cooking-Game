@@ -23,7 +23,10 @@ MixingGame::~MixingGame()
 
 void MixingGame::render()
 {
+    SDL_Renderer* renderer = state.renderer;
 
+    //Render background
+    SDL_RenderTexture(renderer, textures["background"], nullptr, nullptr);
 }
 
 void MixingGame::update()
@@ -63,7 +66,7 @@ SDL_Texture* MixingGame::getIngrTexture(SDL_Renderer* renderer, Ingredient ingr)
 
 //Load textures need for minigame
 void MixingGame::loadTextures() {
-    
+    textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/mixing_game/background_mixing.png");
 }
 
 void MixingGame::cleanup() {
