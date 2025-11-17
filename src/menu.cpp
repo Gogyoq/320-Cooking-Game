@@ -14,6 +14,10 @@ Menu::Menu(SDLState& state)
 }
 
 void Menu::render() {
+    // Set background color
+    SDL_SetRenderDrawColor(state.renderer, 40, 40, 60, 255);
+    SDL_RenderClear(state.renderer);
+
     startButton.render(state);
     settingsButton.render(state);
     exitButton.render(state);
