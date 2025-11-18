@@ -4,6 +4,7 @@
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
 #include "minigames/mixing_game.h"
+#include "minigames/frying_game.h"
 #include "data_structs.h"
 #include <iostream>
 
@@ -168,13 +169,13 @@ void LevelManager::startRecipe()
 {   
     string action = currentRecipe->steps[0].action;
     if (action == "cut") {
-        currentMinigame = make_unique<CuttingGame>(state, recipes[0].steps[0]);
+        currentMinigame = make_unique<CuttingGame>(state, (*currentRecipe).steps[0]);
     }
     else if (action == "mix") { //Placeholders
-        currentMinigame = make_unique<MixingGame>(state, recipes[0].steps[0]);
+        currentMinigame = make_unique<MixingGame>(state, (*currentRecipe).steps[0]);
     }
-    else if (action == "bake") {
-
+    else if (action == "fry") {
+        currentMinigame = make_unique<FryingGame>(state, (*currentRecipe).steps[0]);
     }
     recipeStarted = true;
 }
@@ -185,16 +186,34 @@ void LevelManager::advanceStep()
 }
 
 void LevelManager::loadRecipes() {
-    Recipe mixingTest;
-    mixingTest.name = "Mixing Test";
-    mixingTest.difficulty = 1;
-    mixingTest.description = "Test recipe for Mixing minigame";
+    //Test Frying Recipe
+    Recipe fryingTest;
+    fryingTest.name = "Frying Test";
+    fryingTest.difficulty = 1;
+    fryingTest.description = "Test recipe for Frying minigame";
 
     Ingredient carrot = {
         .name = "carrot",
         .quantity = 1,
         .unit = "whole"
     };
+
+    CookingStep fry = {
+        .action = "fry",
+        .ingredients = {carrot},
+        .duration = 5.0f,
+        .perfectWindow = 1.5f
+    };
+
+    fryingTest.steps.push_back(fry);
+
+    recipes.push_back(fryingTest);
+
+    //Test Frying Recipe
+    Recipe mixingTest;
+    mixingTest.name = "Mixing Test";
+    mixingTest.difficulty = 1;
+    mixingTest.description = "Test recipe for Mixing minigame";
 
     CookingStep mix = {
         .action = "mix",
@@ -208,29 +227,22 @@ void LevelManager::loadRecipes() {
     recipes.push_back(mixingTest);
 
     //Replace later with JSON recipe loading 
-    for (int i = 0; i < 10; i++) {
-        Recipe test;
-        test.name = "Sliced Carrot " + to_string(i+1);
-        test.difficulty = 1;
-        test.description = "Test recipe for Cutting minigame";
+    //Test recipe for cutting minigame
+    Recipe cuttingTest;
+    cuttingTest.name = "Cutting Test";
+    cuttingTest.difficulty = 1;
+    cuttingTest.description = "Test recipe for Cutting minigame";
 
-        Ingredient carrot = {
-            .name = "carrot",
-            .quantity = 1,
-            .unit = "whole"
-        };
+    CookingStep cut = {
+        .action = "cut",
+        .ingredients = {carrot},
+        .duration = 5.0f,
+        .perfectWindow = 1.5f
+    };
 
-        CookingStep cut = {
-            .action = "cut",
-            .ingredients = {carrot},
-            .duration = 5.0f,
-            .perfectWindow = 1.5f
-        };
+    cuttingTest.steps.push_back(cut);
 
-        test.steps.push_back(cut);
-
-        recipes.push_back(test);
-    }
+    recipes.push_back(cuttingTest);
 }
 
 void LevelManager::onSelectClick()

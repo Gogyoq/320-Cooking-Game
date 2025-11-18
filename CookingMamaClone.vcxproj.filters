@@ -36,6 +36,9 @@
     <ClCompile Include="src\minigames\mixing_game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\minigames\frying_game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\menu.h">
@@ -62,10 +65,34 @@
     <ClInclude Include="src\minigames\mixing_game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\minigames\frying_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\no_texture.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="src\res\sprites\mixing_game\background_mixing.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\res\sprites\mixing_game\bowl.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\res\sprites\frying_game\background_frying.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\res\sprites\cutting_game\ai_slop.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\res\sprites\cutting_game\dotted.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\res\sprites\no_texture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="src\res\fonts\BloodyModes.ttf" />
   </ItemGroup>
 </Project>

@@ -25,6 +25,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\menu.cpp" />
     <ClCompile Include="src\minigames\cutting_game.cpp" />
+    <ClCompile Include="src\minigames\frying_game.cpp" />
     <ClCompile Include="src\minigames\mixing_game.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,11 +35,21 @@
     <ClInclude Include="src\level_manager.h" />
     <ClInclude Include="src\menu.h" />
     <ClInclude Include="src\minigames\cutting_game.h" />
+    <ClInclude Include="src\minigames\frying_game.h" />
     <ClInclude Include="src\minigames\minigame.h" />
     <ClInclude Include="src\minigames\mixing_game.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Downloads\no_texture.png" />
+    <Image Include="src\res\sprites\cutting_game\ai_slop.png" />
+    <Image Include="src\res\sprites\cutting_game\dotted.png" />
+    <Image Include="src\res\sprites\frying_game\background_frying.png" />
+    <Image Include="src\res\sprites\mixing_game\background_mixing.png" />
+    <Image Include="src\res\sprites\mixing_game\bowl.png" />
+    <Image Include="src\res\sprites\no_texture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="src\res\fonts\BloodyModes.ttf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
