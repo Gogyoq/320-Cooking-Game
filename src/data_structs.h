@@ -28,7 +28,7 @@ struct SDLState {
 
 struct Ingredient {
     string name;
-    int quantity;
+    int quantity = 0;
     string unit; // "cups", "grams", etc.
 };
 

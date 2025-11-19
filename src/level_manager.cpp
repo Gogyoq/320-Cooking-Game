@@ -201,7 +201,7 @@ void LevelManager::loadRecipes() {
     CookingStep fry = {
         .action = "fry",
         .ingredients = {carrot},
-        .duration = 5.0f,
+        .duration = 15.0f,
         .perfectWindow = 1.5f
     };
 

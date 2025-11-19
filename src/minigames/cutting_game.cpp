@@ -229,7 +229,7 @@ void CuttingGame::spaceRectangles() {
 //Update progress based on cuts remaining
 void CuttingGame::updateProgress()
 {
-    int totalWidth = 600;
+    int totalWidth = progressBarBG.w - 10;
     progressBar.w = totalWidth * (cutsMade / step.duration);
 }
 

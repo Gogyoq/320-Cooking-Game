@@ -26,7 +26,12 @@ private:
 	void onClick();
 	void updateProgress();
 
-	//Rectangles
+	SDLState& state;
+	const CookingStep step;
+	Ingredient ingr;
+	unordered_map<string, SDL_Texture*> textures;
+
+	//Struct for holding rectangles of each cut ingredient
 	struct Rectangles {
 		SDL_FRect destRect;
 		SDL_FRect sourceRect;
@@ -35,11 +40,6 @@ private:
 	SDL_FRect progressBarBG; //Background rect for progress bar
 	SDL_FRect progressBar; //rect for progress bar
 	vector<Rectangles> ingrRects;
-
-	SDLState& state;
-	const CookingStep step;
-	Ingredient ingr;
-	unordered_map<string, SDL_Texture*> textures;
 	uint64_t clickTime;
 	bool isClicked;
 	bool onCooldown;
