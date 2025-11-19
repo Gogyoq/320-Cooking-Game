@@ -102,18 +102,20 @@ void FryingGame::handleEvent(const SDL_Event& event)
 
 bool FryingGame::isComplete() const
 {
-    return false;
+    return progressTime > step.duration;
 }
 
 //Update progress based on cuts remaining
 void FryingGame::updateProgress()
 {
     const float DELTA_TIME = 0.02f; //seconds between an update
-    if (inSafeZone()) {
-        progressTime += DELTA_TIME;
-    }
-    else if (progressTime - DELTA_TIME / 2 >= 0) {
-        progressTime -= DELTA_TIME/2;
+    if (!isComplete()) {//Dont update progress if game is over
+        if (inSafeZone()) {
+            progressTime += DELTA_TIME;
+        }
+        else if (progressTime - DELTA_TIME / 2 >= 0) {
+            progressTime -= DELTA_TIME / 2;
+        }
     }
 
     float oldBarHeight = progressBar.h;
