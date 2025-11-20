@@ -5,6 +5,7 @@
 #include "minigames/cutting_game.h"
 #include "minigames/mixing_game.h"
 #include "minigames/frying_game.h"
+#include "minigames/egg_cracking_game.h"
 #include "data_structs.h"
 #include <iostream>
 
@@ -178,8 +179,22 @@ void LevelManager::startRecipe()
         currentMinigame = make_unique<FryingGame>(state, (*currentRecipe).steps[0]);
     }
     else if (action == "egg") {
-        currentMinigame = make_unique<EggCrackingGame>(state, (*currentRecipe).steps[0]);
+        // normal 3-egg style
+        currentMinigame = make_unique<EggCrackingGame>(
+            state,
+            (*currentRecipe).steps[0],
+            EggCrackingGame::Mode::Normal
+        );
     }
+    else if (action == "egg_endless") {
+    // endless high-score mode
+        currentMinigame = make_unique<EggCrackingGame>(
+            state,
+            (*currentRecipe).steps[0],
+            EggCrackingGame::Mode::Endless
+            );
+        }
+    
     recipeStarted = true;
 }
 
@@ -247,26 +262,43 @@ void LevelManager::loadRecipes() {
 
     recipes.push_back(cuttingTest);
 
-        Recipe eggTest;
-    eggTest.name        = "Egg Cracking Test";
-    eggTest.difficulty  = 1;
+    Recipe eggTest;
+    eggTest.name = "Egg Cracking Test";
+    eggTest.difficulty = 1;
     eggTest.description = "Test recipe for Egg Cracking minigame";
 
     Ingredient eggIngr {
-        .name     = "egg",
+        .name = "egg",
         .quantity = 3,
-        .unit     = "pcs"
+        .unit = "pcs"
     };
 
     CookingStep crackStep {
-        .action        = "egg",      // must match the action string in startRecipe()
-        .ingredients   = { eggIngr },
-        .duration      = 3.0f,       // number of eggs to crack (rounded)
-        .perfectWindow = 0.2f        // not used yet, but kept for consistency
+        .action = "egg",
+        .ingredients = {eggIngr},
+        .duration = 3.0f,  // number of eggs to crack 
+        .perfectWindow = 0.2f
     };
 
     eggTest.steps.push_back(crackStep);
     recipes.push_back(eggTest);
+
+        // Endless Egg Cracking test recipe
+    Recipe eggEndless;
+    eggEndless.name = "Endless Egg Test";
+    eggEndless.difficulty = 2;
+    eggEndless.description = "Endless egg timing — gets faster until you miss.";
+
+    CookingStep endlessStep {
+        .action = "egg_endless", 
+        .ingredients = { eggIngr }, 
+        .duration = 3.0f,           // not important in Endless
+        .perfectWindow = 0.0f
+    };
+
+    eggEndless.steps.push_back(endlessStep);
+    recipes.push_back(eggEndless);
+
 }
 
 void LevelManager::onSelectClick()

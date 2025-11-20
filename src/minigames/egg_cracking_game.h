@@ -11,7 +11,13 @@
 
 class EggCrackingGame : public Minigame {
 public:
-    EggCrackingGame(SDLState& state, const CookingStep& step);
+    // Game mode
+    enum class Mode {
+        Normal, // fixed number of eggs, 0–3 score
+        Endless // keeps going faster until you miss an egg
+    };
+
+    EggCrackingGame(SDLState& state, const CookingStep& step, Mode mode = Mode::Normal);
     ~EggCrackingGame();
 
     void render() override;
@@ -47,28 +53,35 @@ private:
 
     SDLState& state;
     const CookingStep step;
+    Mode mode;   // Normal vs Endless
+    State stateMachine = State::Countdown;
+    CrackAnimState crackAnimState  = CrackAnimState::Idle;
 
     // Eggs / scoring
-    int totalEggs   = 3;
-    int currentEgg  = 0;
+    int totalEggs = 3;   // Normal: #eggs; Endless: just a big cap
+    int currentEgg = 0;
     int pressesPerEgg = 3;   // max presses per egg
     int pressesThisEgg = 0;
     int hitsThisEgg = 0;
     int totalHits = 0;
-    int finalScore = 0;  // Between 0–3
+    int finalScore = 0;   // Normal: 0–3, Endless: eggs survived
+
+    int endlessPerfectEggs = 0;
+
+    bool eggFailed = false;
 
     // Timing
-    uint32_t passDurationMs = 3200; // how long the marker takes to cross the bar
+    uint32_t passDurationMs = 3200;  // ms for one marker pass
+    const uint32_t minPassDurationMs = 800;   // clamp for Endless speed-up
+    const float    speedMultiplier = 0.88f; // each success: passDuration *= speedMultiplier
+
     uint32_t countdownDurationMs = 1000; // 1 second
-    uint32_t resultDurationMs = 900; // result overlay display
+    uint32_t resultDurationMs = 900;  // per-egg result overlay display
 
     uint32_t countdownStartTick = 0;
     uint32_t passStartTick = 0;
     uint32_t resultStartTick = 0;
     uint32_t crackAnimStartMs = 0;
-
-    State stateMachine = State::Countdown;
-    CrackAnimState crackAnimState = CrackAnimState::Idle;
 
     // Layout rects
     SDL_FRect barRect{};
@@ -77,7 +90,7 @@ private:
     SDL_FRect handIdlePos{};
     SDL_FRect handCrackPos{};
     SDL_FRect handRect{};
-    SDL_FRect yolkRect{};
+    SDL_FRect yolkRect{}; // not currently animated
 
     // Textures
     SDL_Texture* texBackground = nullptr;
@@ -91,9 +104,9 @@ private:
     std::vector<SDL_FRect> zoneRects;
     std::vector<bool>      zoneHit;
 
-    // (Yolk feature taken out but left here just in case)
-    bool yolkActive = false;
-    bool yolkSuccessful = false;
+    // Yolk flags (currently unused)
+    bool yolkActive      = false;
+    bool yolkSuccessful  = false;
 
     // RNG for zone jitter
     std::mt19937 rng;
@@ -101,7 +114,7 @@ private:
     // Fading hit markers
     std::vector<HitFeedback> hitFeedbacks;
 
-    // ---------- Internal helpers ----------
+    // -------- Internal helpers --------
 
     // Layout / assets
     void configureLayout();

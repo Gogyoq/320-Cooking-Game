@@ -9,14 +9,20 @@
 
 using namespace std;
 
-EggCrackingGame::EggCrackingGame(SDLState& state, const CookingStep& step)
+EggCrackingGame::EggCrackingGame(SDLState& state, const CookingStep& step, Mode mode)
     : state(state),
-      step(step)
+      step(step),
+      mode(mode)
 {
-    // Use step.duration as "number of eggs" if > 0, else default 3
-    totalEggs = static_cast<int>(std::round(step.duration));
-    if (totalEggs <= 0) {
-        totalEggs = 3;
+    // Normal mode: use step.duration as "number of eggs"
+    if (mode == Mode::Normal) {
+        totalEggs = static_cast<int>(std::round(step.duration));
+        if (totalEggs <= 0) {
+            totalEggs = 3;
+        }
+    } else {
+        // Large cap that will never be reached
+        totalEggs = 9999;
     }
 
     currentEgg = 0;
@@ -37,6 +43,7 @@ EggCrackingGame::EggCrackingGame(SDLState& state, const CookingStep& step)
     zoneHit.assign(3, false);
 
     countdownStartTick = SDL_GetTicks();
+    stateMachine = State::Countdown;
 }
 
 EggCrackingGame::~EggCrackingGame() {
@@ -62,8 +69,8 @@ void EggCrackingGame::configureLayout() {
     barRect.w = barWidth;
     barRect.h = barHeight;
 
-    // Reticle marker: small vertical rectangle moving along the bar
-    float markerWidth = 10.0f;
+    // Reticle marker - small vertical rectangle moving along the bar
+    float markerWidth  = 10.0f;
     float markerHeight = barHeight + 8.0f; // slightly taller than bar
 
     markerRect.w = markerWidth;
@@ -72,7 +79,7 @@ void EggCrackingGame::configureLayout() {
     markerRect.y = barRect.y - 4.0f; // centered vertically over bar
 
     // Bowl somewhere under the hand
-    float bowlWidth = screenW * 0.20f;
+    float bowlWidth  = screenW * 0.20f;
     float bowlHeight = bowlWidth * 0.6f;
     bowlRect.w = bowlWidth;
     bowlRect.h = bowlHeight;
@@ -93,7 +100,7 @@ void EggCrackingGame::configureLayout() {
 
     handRect = handIdlePos;
 
-    // Yolk starts above bowl, falls into it (Removed feature but kept just in-case)
+    // Yolk starts above bowl, falls into it (feature currently disabled but kept)
     yolkRect.w = bowlWidth * 0.25f;
     yolkRect.h = yolkRect.w * 0.7f;
     yolkRect.x = bowlRect.x + (bowlRect.w - yolkRect.w) / 2.0f;
@@ -168,6 +175,7 @@ void EggCrackingGame::generateZonesForCurrentEgg() {
     std::fill(zoneHit.begin(), zoneHit.end(), false);
     pressesThisEgg = 0;
     hitsThisEgg = 0;
+    eggFailed = false;
 
     yolkActive = false;
     yolkSuccessful = false;
@@ -186,25 +194,42 @@ void EggCrackingGame::startNewEgg() {
 
 void EggCrackingGame::finishCurrentEgg() {
     totalHits += hitsThisEgg;
+
+    if (mode == Mode::Endless) {
+        // must hit all zones to survive this egg
+        eggFailed = (hitsThisEgg < static_cast<int>(zoneRects.size()));
+    } else {
+        eggFailed = false; // ignored in Normal mode
+    }
+
     resultStartTick = SDL_GetTicks();
     stateMachine = State::EggResult;
 }
 
+
 void EggCrackingGame::finishMinigame() {
     stateMachine = State::Done;
 
-    float maxHits = static_cast<float>(totalEggs * pressesPerEgg);
-    float ratio = (maxHits > 0.0f) ? (static_cast<float>(totalHits) / maxHits) : 0.0f;
+    if (mode == Mode::Normal) {
+        float maxHits = static_cast<float>(totalEggs * pressesPerEgg);
+        float ratio = (maxHits > 0.0f) ? (static_cast<float>(totalHits) / maxHits) : 0.0f;
 
-    if (ratio >= 0.8f) finalScore = 3;
-    else if (ratio >= 0.5f) finalScore = 2;
-    else if (ratio >= 0.2f) finalScore = 1;
-    else finalScore = 0;
+        if (ratio >= 0.8f) finalScore = 3;
+        else if (ratio >= 0.5f) finalScore = 2;
+        else if (ratio >= 0.2f) finalScore = 1;
+        else finalScore = 0;
 
-    std::cout << "EggCrackingGame finished. totalHits=" << totalHits
-              << " maxHits=" << maxHits
-              << " ratio=" << ratio
-              << " finalScore=" << finalScore << std::endl;
+        std::cout << "EggCrackingGame (Normal) finished. totalHits=" << totalHits
+                  << " maxHits=" << maxHits
+                  << " ratio=" << ratio
+                  << " finalScore=" << finalScore << std::endl;
+    } else {
+        // Endless score = how many eggs survived
+        finalScore = currentEgg; // number of completed eggs
+
+        std::cout << "EggCrackingGame (Endless) finished. eggs survived="
+                  << finalScore << std::endl;
+    }
 }
 
 // -------- Update --------
@@ -242,25 +267,49 @@ void EggCrackingGame::update() {
     }
 
     case State::EggResult: {
-        updateCrackAnimation(now); // continue anim if still playing
+        updateCrackAnimation(now); // continue animation if still playing
         uint64_t elapsed = now - resultStartTick;
+
         if (elapsed >= resultDurationMs) {
-            currentEgg++;
-            if (currentEgg >= totalEggs) {
-                finishMinigame();
-            } else {
-                countdownStartTick = SDL_GetTicks();
-                stateMachine = State::Countdown;
-                crackAnimState = CrackAnimState::Idle;
-                handRect = handIdlePos;
-                yolkActive = false;
+            if (mode == Mode::Normal) {
+                // Step through fixed egg count
+                currentEgg++;
+                if (currentEgg >= totalEggs) {
+                    finishMinigame();
+                } else {
+                    countdownStartTick = SDL_GetTicks();
+                    stateMachine = State::Countdown;
+                    crackAnimState = CrackAnimState::Idle;
+                    handRect = handIdlePos;
+                    yolkActive = false;
+                }
+            } else { // Endless
+                if (eggFailed) {
+                    // Missed egg, then run ends
+                    finishMinigame();
+                } else {
+                    // Survived egg, then increase speed & keep going
+                    currentEgg++;
+
+                    // Speed up but clamp
+                    passDurationMs = std::max(
+                        minPassDurationMs,
+                        static_cast<uint32_t>(passDurationMs * speedMultiplier)
+                    );
+
+                    countdownStartTick = SDL_GetTicks();
+                    stateMachine = State::Countdown;
+                    crackAnimState = CrackAnimState::Idle;
+                    handRect = handIdlePos;
+                    yolkActive = false;
+                }
             }
         }
         break;
     }
 
     case State::Done:
-        // Assuming LevelManager will decide what to do afterwards.
+        // LevelManager will check isComplete() and move on
         break;
     }
 }
@@ -295,7 +344,7 @@ void EggCrackingGame::updateCrackAnimation(uint64_t now) {
         handRect.y = handIdlePos.y + (handCrackPos.y - handIdlePos.y) * t;
 
         if (elapsed >= downDuration) {
-            crackAnimState   = CrackAnimState::Impact;
+            crackAnimState = CrackAnimState::Impact;
             crackAnimStartMs = now;
         }
         break;
@@ -306,7 +355,7 @@ void EggCrackingGame::updateCrackAnimation(uint64_t now) {
 
         uint64_t elapsed = now - crackAnimStartMs;
         if (elapsed >= impactDuration) {
-            crackAnimState   = CrackAnimState::CrackUp;
+            crackAnimState = CrackAnimState::CrackUp;
             crackAnimStartMs = now;
         }
         break;
@@ -321,7 +370,7 @@ void EggCrackingGame::updateCrackAnimation(uint64_t now) {
 
         if (elapsed >= upDuration) {
             crackAnimState = CrackAnimState::Idle;
-            handRect       = handIdlePos;
+            handRect = handIdlePos;
         }
         break;
     }
@@ -357,7 +406,7 @@ void EggCrackingGame::handleSpacePress() {
         }
     }
 
-    // Fading marker for hit or miss (Like Undertale)
+    // Fading marker for hit or miss
     {
         HitFeedback fb;
         float centerX = markerRect.x + markerRect.w * 0.5f;
@@ -367,12 +416,12 @@ void EggCrackingGame::handleSpacePress() {
         fb.rect.y = barRect.y - 4.0f;  // centered on bar
 
         if (hitZone) {
-            fb.color = SDL_Color{255, 105, 180, 220};  // pink-ish for good
+            fb.color = SDL_Color{255, 105, 180, 220};  // pink for good (temporary colours)
         } else {
-            fb.color = SDL_Color{255, 80, 80, 220};    // red-ish for miss
+            fb.color = SDL_Color{255, 80, 80, 220};    // red for miss
         }
 
-        fb.spawnTime = SDL_GetTicks();
+        fb.spawnTime  = SDL_GetTicks();
         fb.lifetimeMs = 400; // fades over 0.4s
 
         hitFeedbacks.push_back(fb);
@@ -539,13 +588,27 @@ void EggCrackingGame::renderHitFeedback() {
 }
 
 void EggCrackingGame::renderUI() {
-    // Egg counter
-    string eggText = "EGG " + to_string(currentEgg + 1) + " / " + to_string(totalEggs);
     SDL_Color white{255, 255, 255, SDL_ALPHA_OPAQUE};
+    SDL_Color ghost{170, 210, 255, SDL_ALPHA_OPAQUE};
+
+    std::string eggText;
+
+    if (mode == Mode::Normal) {
+        eggText = "EGG " + to_string(currentEgg + 1) + " / " + to_string(totalEggs);
+    } else {
+        // Endless: show how many eggs you’ve survived so far
+        eggText = "EGGS CRACKED: " + to_string(currentEgg);
+    }
+
     renderTextCentered(eggText, state.logH * 0.10f, white);
 
-    string info = "Press SPACE to crack!";
-    SDL_Color ghost{170, 210, 255, SDL_ALPHA_OPAQUE};
+    std::string info;
+    if (mode == Mode::Normal) {
+        info = "Press SPACE to crack!";
+    } else {
+        info = "Press SPACE to crack! Don't miss!";
+    }
+
     renderTextCentered(info, state.logH * 0.16f, ghost);
 }
 
@@ -598,8 +661,8 @@ void EggCrackingGame::renderEggResultOverlay() {
     string text;
     if (tier == 3) text = "PERFECT CRACK!";
     else if (tier == 2) text = "Almost EGGcelent!";
-    else if (tier == 1) text = "Messy...";
-    else text = "Shell everywhere!";
+    else if (tier == 1) text = "You're messy...";
+    else text = "You got shell everywhere!";
 
     // 3. Zoom animation factor (0.6 -> 1.1 -> 1.0)
     float scale;
@@ -668,8 +731,15 @@ void EggCrackingGame::renderEggResultOverlay() {
 }
 
 void EggCrackingGame::renderDoneText() {
-    string text = "All eggs cracked! Score: " + to_string(finalScore) + "/3";
     SDL_Color gold{255, 215, 0, SDL_ALPHA_OPAQUE};
+
+    string text;
+    if (mode == Mode::Normal) {
+        text = "All eggs cracked! Score: " + to_string(finalScore) + "/3";
+    } else {
+        text = "Game over! Eggs cracked: " + to_string(finalScore);
+    }
+
     renderTextCentered(text, state.logH * 0.32f, gold);
 }
 
