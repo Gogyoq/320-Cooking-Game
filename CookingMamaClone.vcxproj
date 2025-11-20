@@ -25,6 +25,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\menu.cpp" />
     <ClCompile Include="src\minigames\cutting_game.cpp" />
+    <ClCompile Include="src\minigames\egg_cracking_game.cpp" />
     <ClCompile Include="src\minigames\frying_game.cpp" />
     <ClCompile Include="src\minigames\mixing_game.cpp" />
   </ItemGroup>
@@ -35,6 +36,7 @@
     <ClInclude Include="src\level_manager.h" />
     <ClInclude Include="src\menu.h" />
     <ClInclude Include="src\minigames\cutting_game.h" />
+    <ClInclude Include="src\minigames\egg_cracking_game.h" />
     <ClInclude Include="src\minigames\frying_game.h" />
     <ClInclude Include="src\minigames\minigame.h" />
     <ClInclude Include="src\minigames\mixing_game.h" />

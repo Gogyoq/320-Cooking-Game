@@ -229,6 +229,12 @@ void LevelManager::advanceStep()
         else if (action == "fry") {
             currentMinigame = make_unique<FryingGame>(state, (*currentRecipe).steps[0]);
         }
+        else if (action == "egg") {
+            currentMinigame = make_unique<EggCrackingGame>(state, (*currentRecipe).steps[0], EggCrackingGame::Mode::Normal);
+        }
+        else if (action == "egg_endless") {
+            currentMinigame = make_unique<EggCrackingGame>(state, (*currentRecipe).steps[0], EggCrackingGame::Mode::Endless);
+        }
 
         currentRecipe->currentStep++;
         recipeStarted = true;

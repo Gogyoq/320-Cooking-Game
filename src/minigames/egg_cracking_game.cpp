@@ -110,25 +110,16 @@ void EggCrackingGame::configureLayout() {
 void EggCrackingGame::loadTextures() {
     // images placed in src/res/sprites/egg_game/
 
-    texBackground = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/bg_kitchen.png");
-    texBowl = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/bowl.png");
-    texHandIdle = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/hand_idle.png");
-    texHandCrack = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/hand_crack.png");
-    texYolk = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/yolk.png");
+    texBackground = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/bg_kitchen.png");
+    texBowl = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/bowl.png");
+    texHandIdle = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/hand_idle.png");
+    texHandCrack = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/hand_crack.png");
+    texYolk = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/yolk.png");
 
-    texResult[0] = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/egg_result_0.png");
-    texResult[1] = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/egg_result_1.png");
-    texResult[2] = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/egg_result_2.png");
-    texResult[3] = IMG_LoadTexture(state.renderer,
-        "src/res/sprites/egg_game/egg_result_3.png");
+    texResult[0] = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/egg_result_0.png");
+    texResult[1] = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/egg_result_1.png");
+    texResult[2] = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/egg_result_2.png");
+    texResult[3] = IMG_LoadTexture(state.renderer, "src/res/sprites/egg_game/egg_result_3.png");
 }
 
 void EggCrackingGame::cleanupTextures() {
