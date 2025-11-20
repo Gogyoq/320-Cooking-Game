@@ -11,8 +11,9 @@
 using namespace std;
 
 //Level Manager Implementation
-LevelManager::LevelManager(SDLState& state) 
-: state(state), currentMinigame(nullptr), recipeStarted(false),
+LevelManager::LevelManager(SDLState& state)
+    : state(state), currentMinigame(nullptr), recipeStarted(false),
+    recipeFinished(false), playStartAnimation(false), playFinishAnimation(false),
   selectButton(300, 320, 200, 60, "Select", [this]() { onSelectClick(); })
 {
     //Load all available recipes
@@ -22,6 +23,33 @@ LevelManager::LevelManager(SDLState& state)
 void LevelManager::render() {
     if (recipeStarted && currentMinigame != nullptr) {
         currentMinigame->render();
+
+        if (playStartAnimation || playFinishAnimation) {
+            string text = playStartAnimation ? "Start!" : "Finished!";
+            SDL_Color textColor = { 255, 255, 255, SDL_ALPHA_OPAQUE };
+
+            SDL_Surface* textSurface = TTF_RenderText_Solid(state.font, text.c_str(), 0, textColor);
+            if (textSurface) {
+                SDL_Texture* textTexture = SDL_CreateTextureFromSurface(state.renderer, textSurface);
+                if (textTexture) {
+                    float textW, textH;
+                    SDL_GetTextureSize(textTexture, &textW, &textH);
+                    textW = textW * 4;
+                    textH = textH * 4;
+                    // Center the text on screen
+                    SDL_FRect textRect = {
+                        (state.logW - textW) / 2,
+                        (state.logH - textH) / 2,
+                        textW,
+                        textH
+                    };
+
+                    SDL_RenderTexture(state.renderer, textTexture, nullptr, &textRect);
+                    SDL_DestroyTexture(textTexture);
+                }
+                SDL_DestroySurface(textSurface);
+            }
+        }
     }
     else { //Render the level select screen
         // Set background color
@@ -100,7 +128,27 @@ void LevelManager::render() {
 
 void LevelManager::update() {
     if (recipeStarted && currentMinigame != nullptr) {
-        currentMinigame->update();
+        if (playStartAnimation || playFinishAnimation) {
+            animationTickCounter++;
+
+            // Check if 2 seconds have elapsed
+            if (animationTickCounter >= ANIMATION_DURATION_TICKS) {
+                if (playStartAnimation) {
+                    playStartAnimation = false;
+                }
+                else {
+                    playFinishAnimation = false;
+                    advanceStep();
+                }
+                animationTickCounter = 0; // Reset counter
+            }
+        }
+        else if (currentMinigame->isComplete() && !recipeFinished) {
+            playFinishAnimation = true;
+        }
+        else {
+            currentMinigame->update();
+        }
     }
     else {  //update the level select screen
         // Interpolate current position toward target
@@ -116,7 +164,9 @@ void LevelManager::update() {
 
 void LevelManager::handleEvent(const SDL_Event& event) {
     if (recipeStarted && currentMinigame != nullptr) {
-        currentMinigame->handleEvent(event);
+        if (!playStartAnimation && !playFinishAnimation) {
+            currentMinigame->handleEvent(event);
+        }
     }
     else {  //Event handle the level select screen
         if (event.type == SDL_EVENT_KEY_DOWN) {
@@ -165,24 +215,27 @@ void LevelManager::handleEvent(const SDL_Event& event) {
     }
 }
 
-void LevelManager::startRecipe()
-{   
-    string action = currentRecipe->steps[0].action;
-    if (action == "cut") {
-        currentMinigame = make_unique<CuttingGame>(state, (*currentRecipe).steps[0]);
-    }
-    else if (action == "mix") { //Placeholders
-        currentMinigame = make_unique<MixingGame>(state, (*currentRecipe).steps[0]);
-    }
-    else if (action == "fry") {
-        currentMinigame = make_unique<FryingGame>(state, (*currentRecipe).steps[0]);
-    }
-    recipeStarted = true;
-}
-
 void LevelManager::advanceStep()
 {
+    if (currentRecipe->currentStep <= currentRecipe->steps.size() - 1) {
+        string action = currentRecipe->steps[currentRecipe->currentStep].action;
+        if (action == "cut") {
+            currentMinigame = make_unique<CuttingGame>(state, (*currentRecipe).steps[0]);
+        }
+        else if (action == "mix") { 
+            currentMinigame = make_unique<MixingGame>(state, (*currentRecipe).steps[0]);
+        }
+        else if (action == "fry") {
+            currentMinigame = make_unique<FryingGame>(state, (*currentRecipe).steps[0]);
+        }
 
+        currentRecipe->currentStep++;
+        recipeStarted = true;
+        playStartAnimation = true;
+    }
+    else { //No more cooking steps means recipe is complete
+        recipeFinished = true;
+    }
 }
 
 void LevelManager::loadRecipes() {
@@ -243,13 +296,22 @@ void LevelManager::loadRecipes() {
     cuttingTest.steps.push_back(cut);
 
     recipes.push_back(cuttingTest);
+
+    Recipe multipleTest;
+    multipleTest.name = "Multiple Minigames Test";
+    multipleTest.difficulty = 1;
+    multipleTest.description = "Test recipe for chaining minigames";
+
+    multipleTest.steps.push_back(cut);
+    multipleTest.steps.push_back(fry);
+    recipes.push_back(multipleTest);
 }
 
 void LevelManager::onSelectClick()
 {
     cout << "Select Button Clicked! Recipe Index: " << selectedRecipeIndex << endl;
     currentRecipe = &recipes[selectedRecipeIndex];
-    startRecipe();
+    advanceStep();
 }
 
 bool LevelManager::isCarouselAnimating() const
@@ -259,9 +321,9 @@ bool LevelManager::isCarouselAnimating() const
 }
 
 Recipe* LevelManager::getCurrentRecipe() {
-    return nullptr;
+    return currentRecipe;
 }
 
 bool LevelManager::isRecipeComplete() {
-    return false;
+    return recipeFinished;
 }

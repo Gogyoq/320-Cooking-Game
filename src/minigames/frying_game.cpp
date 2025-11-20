@@ -14,7 +14,7 @@ FryingGame::FryingGame(SDLState& state, CookingStep step)
     currentTime(SDL_GetTicks()), progressTime(0),
     safeZoneSpeed(100.0f), safeZoneVX(100.0f), safeZoneVY(100.0f),
     dialAngleX(0), dialAngleY(0),
-    gameField(450, 40, 250, 250), safeZone(570, 70, 50, 50), mouseRect(450, 40, 10, 10),
+    gameField(450, 40, 250, 250), safeZone(570, 70, 50, 50), mouseRect(570, 70, 10, 10),
     progressBar(735, 405, 25, 0), progressBarBG(730, 40, 35, 370),
     dialRectX(525,325,60,60), dialRectY(625,325,60,60), ingrRect(160,90,230,230)
 {
@@ -135,8 +135,8 @@ void FryingGame::updateSafeZone()
     float elapsedTime = (currentTime - startTime) / 1000.0f;
 
     // Size shrinks over time with minimum cap
-    const float START_SIZE = 70.0f;     // Starting size
-    const float MIN_SIZE = 30.0f;       // Minimum size
+    const float START_SIZE = 80.0f;     // Starting size
+    const float MIN_SIZE = 40.0f;       // Minimum size
     const float SHRINK_DURATION = 60.0f; // Time to reach minimum (30 seconds)
 
     // Linear interpolation from START_SIZE to MIN_SIZE over SHRINK_DURATION

@@ -13,7 +13,6 @@ public:
 
     void loadRecipes();
     Recipe* getCurrentRecipe();
-    void startRecipe();
     void advanceStep();
     bool isRecipeComplete();
 
@@ -29,7 +28,9 @@ private:
     SDLState& state;
     std::vector<Recipe> recipes;
     Recipe* currentRecipe = nullptr;
-    bool recipeStarted;
+    bool recipeStarted, recipeFinished, playStartAnimation, playFinishAnimation;
+    int animationTickCounter = 0;
+    const int ANIMATION_DURATION_TICKS = 100; // 2 seconds at 50 updates/second
 
     //Variables for level select screen
     Button selectButton;
