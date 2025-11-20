@@ -6,6 +6,7 @@
 #include "button.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
+#include "minigames/egg_cracking_game.h"
 
 class LevelManager {
 public:
