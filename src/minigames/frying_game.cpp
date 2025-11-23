@@ -2,7 +2,6 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
 #include <iostream>
-#include <algorithm> 
 #include <string>
 #include "frying_game.h"
 #include "minigame.h"
@@ -15,9 +14,9 @@ FryingGame::FryingGame(SDLState& state, CookingStep step)
     currentTime(SDL_GetTicks()), progressTime(0),
     safeZoneSpeed(100.0f), safeZoneVX(100.0f), safeZoneVY(100.0f),
     dialAngleX(0), dialAngleY(0),
-    gameField(450, 40, 250, 250), safeZone(570, 70, 50, 50), mouseRect(570, 70, 10, 10),
-    progressBar(735, 405, 25, 0), progressBarBG(730, 40, 35, 370),
-    dialRectX(525,325,60,60), dialRectY(625,325,60,60), ingrRect(160,90,230,230)
+    gameField{450, 40, 250, 250}, safeZone{570, 70, 50, 50}, mouseRect{450, 40, 10, 10},
+    progressBar{735, 405, 25, 0}, progressBarBG{730, 40, 35, 370},
+    dialRectX{525,325,60,60}, dialRectY{625,325,60,60}, ingrRect{160,90,230,230}
 {
     ingr = step.ingredients[0]; //Maybe update this to check if the array is empty later im too lazy
     loadTextures(); //Load all textures for this minigame
@@ -209,10 +208,10 @@ void FryingGame::updateDials()
     relativeX = std::max(-1.0f, std::min(1.0f, relativeX));
     relativeY = std::max(-1.0f, std::min(1.0f, relativeY));
 
-    // Map to dial angles (-90° to +90°)
-    // relativeX = -1.0 (left edge) -> -90°
-    // relativeX =  0.0 (center)    ->   0°
-    // relativeX = +1.0 (right edge)-> +90°
+    // Map to dial angles (-90ï¿½ to +90ï¿½)
+    // relativeX = -1.0 (left edge) -> -90ï¿½
+    // relativeX =  0.0 (center)    ->   0ï¿½
+    // relativeX = +1.0 (right edge)-> +90ï¿½
     dialAngleX = relativeX * 90.0;
     dialAngleY = relativeY * 90.0;
 }
