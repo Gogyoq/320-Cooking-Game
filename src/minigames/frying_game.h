@@ -27,7 +27,7 @@ private:
 	SDL_FRect getAspectRatioRect(SDL_Texture* texture, const SDL_FRect& targetRect);
 
 	SDLState& state;
-	const CookingStep step;
+	CookingStep step;
 	Ingredient ingr;
 	unordered_map<string, SDL_Texture*> textures;
 

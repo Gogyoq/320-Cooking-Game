@@ -2,6 +2,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
 #include <iostream>
+#include <algorithm> 
 #include <string>
 #include "frying_game.h"
 #include "minigame.h"
@@ -117,6 +118,9 @@ void FryingGame::updateProgress()
             progressTime -= DELTA_TIME / 2;
         }
     }
+
+    step.score = min(100, (int)(100 * (progressTime / ((currentTime-startTime) / 1000))));
+    cout << step.score << endl;
 
     float oldBarHeight = progressBar.h;
 

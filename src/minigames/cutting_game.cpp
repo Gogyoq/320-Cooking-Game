@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
+#include <algorithm> 
 #include <iostream>
 #include <string>
 #include "cutting_game.h"
@@ -94,6 +95,19 @@ void CuttingGame::update() {
     }
 
     updateProgress();
+
+    // Find min and max widths
+    float minWidth = INT_MAX;
+    float maxWidth = 0;
+    for (const auto& rect : ingrRects) {
+        minWidth = min(minWidth, rect.destRect.w);
+        maxWidth = max(maxWidth, rect.destRect.w);
+    }
+
+    // Calculate evenness: smaller range = more even
+    float range = maxWidth - minWidth;
+    float evenness = (maxWidth > 0) ? (1.0f - range / maxWidth) : 1.0f;
+    step.score = std::max(1, std::min(100, static_cast<int>(evenness * 100)));
 }
 
 void CuttingGame::handleEvent(const SDL_Event& event) {

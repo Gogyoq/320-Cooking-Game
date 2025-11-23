@@ -27,7 +27,7 @@ private:
 	void updateProgress();
 
 	SDLState& state;
-	const CookingStep step;
+	CookingStep step;
 	Ingredient ingr;
 	unordered_map<string, SDL_Texture*> textures;
 

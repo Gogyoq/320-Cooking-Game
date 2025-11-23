@@ -37,6 +37,7 @@ struct CookingStep {
     vector<Ingredient> ingredients;
     float duration;          // # of cuts/spins/seconds to complete the task. usage depends on minigame
     float perfectWindow;     // timing tolerance
+	int score = 0;
 };
 
 struct Recipe {
