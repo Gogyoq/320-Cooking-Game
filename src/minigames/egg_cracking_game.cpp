@@ -203,12 +203,13 @@ void EggCrackingGame::finishMinigame() {
 
     if (mode == Mode::Normal) {
         float maxHits = static_cast<float>(totalEggs * pressesPerEgg);
-        float ratio = (maxHits > 0.0f) ? (static_cast<float>(totalHits) / maxHits) : 0.0f;
+        float ratio = (maxHits > 0.0f)
+            ? (static_cast<float>(totalHits) / maxHits)
+            : 0.0f;
 
-        if (ratio >= 0.8f) finalScore = 3;
-        else if (ratio >= 0.5f) finalScore = 2;
-        else if (ratio >= 0.2f) finalScore = 1;
-        else finalScore = 0;
+        // Score out of 100 for results screen
+        int rawScore = static_cast<int>(std::round(100.0f * ratio));
+        finalScore = std::clamp(rawScore, 0, 100);
 
         std::cout << "EggCrackingGame (Normal) finished. totalHits=" << totalHits
                   << " maxHits=" << maxHits
@@ -726,7 +727,7 @@ void EggCrackingGame::renderDoneText() {
 
     string text;
     if (mode == Mode::Normal) {
-        text = "All eggs cracked! Score: " + to_string(finalScore) + "/3";
+        text = "All eggs cracked! Score: " + to_string(finalScore) + "/100";
     } else {
         text = "Game over! Eggs cracked: " + to_string(finalScore);
     }
