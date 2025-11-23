@@ -96,7 +96,7 @@ void LevelManager::render() {
             SDL_RenderFillRect(state.renderer, &cardRect);
 
             //Render text
-            string text = recipes[selectedRecipeIndex].name;
+            string text = recipes[i].name;
             SDL_Color textColor = { 0, 0, 0, SDL_ALPHA_OPAQUE };
             SDL_Surface* textSurface = TTF_RenderText_Solid(state.font, text.c_str(), 0, textColor);
             if (textSurface) {
