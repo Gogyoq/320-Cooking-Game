@@ -120,7 +120,6 @@ void FryingGame::updateProgress()
     }
 
     step.score = min(100, (int)(100 * (progressTime / ((currentTime-startTime) / 1000))));
-    cout << step.score << endl;
 
     float oldBarHeight = progressBar.h;
 
