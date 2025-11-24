@@ -21,7 +21,7 @@ namespace {
 MixingGame::MixingGame(SDLState& state, CookingStep step)
     : state(state),
     step(step),
-    ingr(step.ingredients.empty() ? Ingredient{ "carrot", 1, "" } : step.ingredients[0]),
+    // ingr(step.ingredients.empty() ? Ingredient{ "carrot", 1, "" } : step.ingredients[0]),
     bowlRect{ state.logW / 2 - 220.0f, state.logH / 2 - 150.0f, 440.0f, 300.0f },
     ingredientRect{},
     progressBarBG{ state.logW / 2 - 250.0f, 40.0f, 500.0f, 35.0f },
