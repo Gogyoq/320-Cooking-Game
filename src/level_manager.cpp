@@ -397,16 +397,17 @@ void LevelManager::renderResults()
     SDL_FRect overlay = { 0.0f, 0.0f, static_cast<float>(state.logW), static_cast<float>(state.logH) };
     SDL_RenderFillRect(state.renderer, &overlay);
 
-    int startY = 50;
-    int barHeight = 40;
-    int spacing = 10;
+    if (resultScores.size() > 0) {
+        int barHeight = 60;
+        float barMaxWidth = 400.0f;
+        float barY = (state.logH - barHeight) / 2.0f;
 
-    for (size_t i = 0; i < resultScores.size(); ++i) {
         SDL_FRect rect;
-        rect.x = 50.0f;
-        rect.y = static_cast<float>(startY + i * (barHeight + spacing));
-        rect.w = static_cast<float>(resultScores[i] * 5);
+        rect.w = static_cast<float>(resultScores[0] * 4);  // Scale factor
+        if (rect.w > barMaxWidth) rect.w = barMaxWidth;
         rect.h = static_cast<float>(barHeight);
+        rect.x = (state.logW - rect.w) / 2.0f;  // Center horizontally
+        rect.y = barY;
 
         SDL_SetRenderDrawColor(state.renderer, 0, 200, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(state.renderer, &rect);
@@ -415,7 +416,7 @@ void LevelManager::renderResults()
         SDL_RenderRect(state.renderer, &rect);
 
         if (state.font) {
-            string scoreText = to_string(resultScores[i]);
+            string scoreText = to_string(resultScores[0]);
             SDL_Color textColor = { 255, 255, 255, SDL_ALPHA_OPAQUE };
             SDL_Surface* textSurface = TTF_RenderText_Solid(state.font, scoreText.c_str(), 0, textColor);
 
@@ -426,8 +427,8 @@ void LevelManager::renderResults()
                     SDL_GetTextureSize(textTexture, &textW, &textH);
 
                     SDL_FRect textRect = {
-                        rect.x + (rect.w - textW) / 2,
-                        rect.y + (rect.h - textH) / 2,
+                        rect.x + (rect.w - textW) / 2.0f,
+                        rect.y + (rect.h - textH) / 2.0f,
                         textW,
                         textH
                     };
