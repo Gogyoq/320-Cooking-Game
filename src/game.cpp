@@ -129,7 +129,7 @@ bool Game::initialize() {
 	}
 
 	//Load the font
-	state.font = TTF_OpenFont("src/res/fonts/Royer-jyq7.ttf", 28);  // 32 is font size
+	state.font = TTF_OpenFont("src/res/fonts/BloodyModes.ttf", 28);  // 32 is font size
 	if (!state.font) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL_ttf", state.window);
 		TTF_Quit();
@@ -138,7 +138,7 @@ bool Game::initialize() {
 	}
 
 	//Load the smaller font for non-selected cards
-	state.fontSmall = TTF_OpenFont("src/res/fonts/Royer-jyq7.ttf", 20); 
+	state.fontSmall = TTF_OpenFont("src/res/fonts/BloodyModes.ttf", 20); 
 	if (!state.fontSmall) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Error initializing SDL_ttf for small font", state.window);
 		TTF_Quit();
