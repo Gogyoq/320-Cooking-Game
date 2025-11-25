@@ -22,8 +22,11 @@ public:
     void handleEvent(const SDL_Event& event);
 
 private:
+    void renderResults();
+    void startResultsDisplay(const std::vector<int>& scores);
     void onSelectClick();
     bool isCarouselAnimating() const;
+    void resetToLevelSelect();
 
     unique_ptr<Minigame> currentMinigame;
     SDLState& state;
@@ -41,5 +44,10 @@ private:
     const float SCROLL_SPEED = 0.15f;    // Interpolation speed (0.0-1.0)
     const float CARD_WIDTH = 300.0f;
     const float CARD_SPACING = 50.0f;
-};
 
+    // Results handling
+    bool showingResults = false;
+    uint64_t resultsStartTick = 0;
+    const uint64_t RESULTS_DURATION_MS = 3000;
+    std::vector<int> resultScores;
+};

@@ -1,5 +1,6 @@
 #include <vector>
 #include <memory>
+#include <cstdint>
 #include "level_manager.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
@@ -25,7 +26,11 @@ void LevelManager::render() {
     if (recipeStarted && currentMinigame != nullptr) {
         currentMinigame->render();
 
-        if (playStartAnimation || playFinishAnimation) {
+        if (showingResults) {
+            renderResults();
+        }
+
+        if ((playStartAnimation || playFinishAnimation) && !showingResults) {
             string text = playStartAnimation ? "Start!" : "Finished!";
             SDL_Color textColor = { 255, 255, 255, SDL_ALPHA_OPAQUE };
 
@@ -129,7 +134,15 @@ void LevelManager::render() {
 
 void LevelManager::update() {
     if (recipeStarted && currentMinigame != nullptr) {
-        if (playStartAnimation || playFinishAnimation) {
+        if (showingResults) {
+            uint64_t elapsed = SDL_GetTicks() - resultsStartTick;
+            if (elapsed >= RESULTS_DURATION_MS) {
+                showingResults = false;
+                playFinishAnimation = true;
+                animationTickCounter = 0;
+            }
+        }
+        else if (playStartAnimation || playFinishAnimation) {
             animationTickCounter++;
 
             // Check if 2 seconds have elapsed
@@ -145,7 +158,7 @@ void LevelManager::update() {
             }
         }
         else if (currentMinigame->isComplete() && !recipeFinished) {
-            playFinishAnimation = true;
+            startResultsDisplay({ currentMinigame->getScore() });
         }
         else {
             currentMinigame->update();
@@ -165,7 +178,7 @@ void LevelManager::update() {
 
 void LevelManager::handleEvent(const SDL_Event& event) {
     if (recipeStarted && currentMinigame != nullptr) {
-        if (!playStartAnimation && !playFinishAnimation) {
+        if (!playStartAnimation && !playFinishAnimation && !showingResults) {
             currentMinigame->handleEvent(event);
         }
     }
@@ -216,6 +229,86 @@ void LevelManager::handleEvent(const SDL_Event& event) {
     }
 }
 
+void LevelManager::startResultsDisplay(const std::vector<int>& scores)
+{
+    resultScores = scores;
+    showingResults = true;
+    resultsStartTick = SDL_GetTicks();
+    animationTickCounter = 0;
+}
+
+void LevelManager::renderResults()
+{
+    SDL_BlendMode previousBlendMode = SDL_BLENDMODE_NONE;
+    SDL_GetRenderDrawBlendMode(state.renderer, &previousBlendMode);
+    SDL_SetRenderDrawBlendMode(state.renderer, SDL_BLENDMODE_BLEND);
+
+    SDL_SetRenderDrawColor(state.renderer, 0, 0, 0, 200);
+    SDL_FRect overlay = { 0.0f, 0.0f, static_cast<float>(state.logW), static_cast<float>(state.logH) };
+    SDL_RenderFillRect(state.renderer, &overlay);
+
+    int startY = 50;
+    int barHeight = 40;
+    int spacing = 10;
+
+    for (size_t i = 0; i < resultScores.size(); ++i) {
+        SDL_FRect rect;
+        rect.x = 50.0f;
+        rect.y = static_cast<float>(startY + i * (barHeight + spacing));
+        rect.w = static_cast<float>(resultScores[i] * 5);
+        rect.h = static_cast<float>(barHeight);
+
+        SDL_SetRenderDrawColor(state.renderer, 0, 200, 0, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(state.renderer, &rect);
+
+        SDL_SetRenderDrawColor(state.renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderRect(state.renderer, &rect);
+
+        if (state.font) {
+            string scoreText = to_string(resultScores[i]);
+            SDL_Color textColor = { 255, 255, 255, SDL_ALPHA_OPAQUE };
+            SDL_Surface* textSurface = TTF_RenderText_Solid(state.font, scoreText.c_str(), 0, textColor);
+
+            if (textSurface) {
+                SDL_Texture* textTexture = SDL_CreateTextureFromSurface(state.renderer, textSurface);
+                if (textTexture) {
+                    float textW, textH;
+                    SDL_GetTextureSize(textTexture, &textW, &textH);
+
+                    SDL_FRect textRect = {
+                        rect.x + (rect.w - textW) / 2,
+                        rect.y + (rect.h - textH) / 2,
+                        textW,
+                        textH
+                    };
+
+                    SDL_RenderTexture(state.renderer, textTexture, nullptr, &textRect);
+                    SDL_DestroyTexture(textTexture);
+                }
+                SDL_DestroySurface(textSurface);
+            }
+        }
+    }
+
+    SDL_SetRenderDrawBlendMode(state.renderer, previousBlendMode);
+}
+
+void LevelManager::resetToLevelSelect()
+{
+    recipeStarted = false;
+    playStartAnimation = false;
+    playFinishAnimation = false;
+    showingResults = false;
+    animationTickCounter = 0;
+    resultsStartTick = 0;
+    resultScores.clear();
+    currentMinigame.reset();
+
+    if (currentRecipe) {
+        currentRecipe->currentStep = 0;
+    }
+}
+
 void LevelManager::advanceStep()
 {
     if (currentRecipe->currentStep <= currentRecipe->steps.size() - 1) {
@@ -242,6 +335,7 @@ void LevelManager::advanceStep()
     }
     else { //No more cooking steps means recipe is complete
         recipeFinished = true;
+        resetToLevelSelect();
     }
 }
 
@@ -354,7 +448,10 @@ void LevelManager::loadRecipes() {
 void LevelManager::onSelectClick()
 {
     cout << "Select Button Clicked! Recipe Index: " << selectedRecipeIndex << endl;
+    recipeFinished = false;
+    resetToLevelSelect();
     currentRecipe = &recipes[selectedRecipeIndex];
+    currentRecipe->currentStep = 0;
     advanceStep();
 }
 
