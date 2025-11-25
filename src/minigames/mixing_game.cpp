@@ -83,7 +83,7 @@ void MixingGame::render()
     float spoonLength = bowlRadius * 0.9f;
     float spoonEndX = bowlCenter.x + cos(lastAngle) * spoonLength;
     float spoonEndY = bowlCenter.y + sin(lastAngle) * spoonLength;
-    SDL_RenderLine(renderer, (int)bowlCenter.x, (int)bowlCenter.y, (int)spoonEndX, (int)spoonEndY);
+    SDL_RenderLine(renderer, bowlCenter.x, bowlCenter.y, spoonEndX, spoonEndY);
     SDL_FRect spoonTip = { spoonEndX - 4, spoonEndY - 4, 8, 8 };
     SDL_RenderFillRect(renderer, &spoonTip);
 

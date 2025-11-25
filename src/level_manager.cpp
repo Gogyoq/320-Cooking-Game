@@ -18,8 +18,6 @@ LevelManager::LevelManager(SDLState& state)
   selectButton(300, 320, 200, 100, "Select","", [this]() { onSelectClick(); }),
   rightButton(10, 100, 60, 60, "Settings", "", [this]() { lClick(); }),
   leftButton(10, 10, 60, 60, "Settings", "", [this]() { rClick(); })
-    
-  
 {
     //Load all available recipes
     loadTextures();
@@ -294,7 +292,7 @@ void LevelManager::loadRecipes() {
     CookingStep fry = {
         .action = "fry",
         .ingredients = {carrot},
-        .duration = 15.0f,
+        .duration = 5.0f,
         .perfectWindow = 1.5f
     };
 

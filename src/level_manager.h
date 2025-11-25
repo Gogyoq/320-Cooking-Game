@@ -4,7 +4,7 @@
 #include <memory>
 #include "data_structs.h"
 #include "button.h"
-#include "../image_button.h"
+#include "image_button.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
 #include "minigames/egg_cracking_game.h"
@@ -41,8 +41,6 @@ private:
     ImageButton selectButton;
 	ImageButton leftButton;
 	ImageButton rightButton;
-
-    ImageButton cardIll;
 
     SDL_Texture* leftTexture = nullptr;
     SDL_Texture* rightTexture = nullptr;

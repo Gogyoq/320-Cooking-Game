@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="image_button.cpp" />
+    <ClCompile Include="src\image_button.cpp" />
     <ClCompile Include="src\button.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\level_manager.cpp" />
@@ -31,7 +31,7 @@
     <ClCompile Include="src\minigames\mixing_game.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="image_button.h" />
+    <ClInclude Include="src\image_button.h" />
     <ClInclude Include="src\button.h" />
     <ClInclude Include="src\data_structs.h" />
     <ClInclude Include="src\game.h" />

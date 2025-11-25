@@ -42,7 +42,7 @@
     <ClCompile Include="src\minigames\egg_cracking_game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="image_button.cpp">
+    <ClCompile Include="src\image_button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,7 +77,7 @@
     <ClInclude Include="src\minigames\egg_cracking_game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="image_button.h">
+    <ClInclude Include="src\image_button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
