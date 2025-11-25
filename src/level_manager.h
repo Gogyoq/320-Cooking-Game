@@ -4,6 +4,7 @@
 #include <memory>
 #include "data_structs.h"
 #include "button.h"
+#include "../image_button.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
 #include "minigames/egg_cracking_game.h"
@@ -23,6 +24,9 @@ public:
 
 private:
     void onSelectClick();
+    void lClick();
+    void rClick();
+    void configureLayout();
     bool isCarouselAnimating() const;
 
     unique_ptr<Minigame> currentMinigame;
@@ -34,7 +38,25 @@ private:
     const int ANIMATION_DURATION_TICKS = 100; // 2 seconds at 50 updates/second
 
     //Variables for level select screen
-    Button selectButton;
+    ImageButton selectButton;
+	ImageButton leftButton;
+	ImageButton rightButton;
+
+    ImageButton cardIll;
+
+    SDL_Texture* leftTexture = nullptr;
+    SDL_Texture* rightTexture = nullptr;
+    SDL_Texture* selectTexture = nullptr;
+
+    SDL_Texture* ill_cooking = nullptr;
+    SDL_Texture* ill_cracking = nullptr;
+    SDL_Texture* ill_mixing = nullptr;
+    SDL_Texture* ill_cutting = nullptr;
+
+    // Layout / assets
+    void loadTextures();
+    void cleanupTextures();
+
     int selectedRecipeIndex = 0;
     float currentScrollPosition = 0.0f;  // Current visual position
     float targetScrollPosition = 0.0f;   // Where we're scrolling to

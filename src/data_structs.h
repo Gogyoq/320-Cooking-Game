@@ -16,14 +16,14 @@ enum class GameState {
 };
 
 struct SDLState {
-	SDL_Window* window = nullptr;
-	SDL_Renderer* renderer = nullptr;
-	GameState gameState = GameState::MAIN_MENU;
-	TTF_Font* font = nullptr;
-	int width = 1600;
-	int height = 900;
-	int logW = 800;
-	int logH = 450;
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    GameState gameState = GameState::MAIN_MENU;
+    TTF_Font* font = nullptr;
+    int width = 1600;
+    int height = 900;
+    int logW = 800;
+    int logH = 450;
 };
 
 struct Ingredient {

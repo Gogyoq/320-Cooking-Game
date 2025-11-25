@@ -23,7 +23,7 @@ CuttingGame::CuttingGame(SDLState& state, CookingStep step)
     progressBar = { .x = 100, .y = 350, .w = 0, .h = 25 };
     progressBarBG = { .x = 95, .y = 345, .w = 610, .h = 35 };
     Rectangles initRect{
-        .destRect = {.x = 200, .y = 100, .w = 400, .h = 200 },
+        .destRect = {.x = 200, .y = 165, .w = 400, .h = 200 },
         .sourceRect = {.x = 0, .y = 0, .w = (float)textures[ingr.name]->w, .h = (float)textures[ingr.name]->h}
     };
     ingrRects.push_back(initRect);
@@ -263,7 +263,7 @@ SDL_Texture* CuttingGame::getIngrTexture(SDL_Renderer* renderer, Ingredient ingr
 
 //Load textures need for minigame
 void CuttingGame::loadTextures() {
-    textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/ai_slop.png");
+    textures["background"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/bg.png");
     textures["knife"] = IMG_LoadTexture(state.renderer, "src/res/sprites/cutting_game/dotted.png");
     textures[ingr.name] = getIngrTexture(state.renderer, ingr);
 }

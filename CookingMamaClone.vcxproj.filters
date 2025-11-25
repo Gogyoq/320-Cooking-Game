@@ -42,6 +42,9 @@
     <ClCompile Include="src\minigames\egg_cracking_game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="image_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\menu.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\minigames\egg_cracking_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image_button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
