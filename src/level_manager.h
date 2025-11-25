@@ -4,7 +4,7 @@
 #include <memory>
 #include "data_structs.h"
 #include "button.h"
-#include "../image_button.h"
+#include "image_button.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
 #include "minigames/egg_cracking_game.h"
@@ -23,11 +23,14 @@ public:
     void handleEvent(const SDL_Event& event);
 
 private:
+    void renderResults();
+    void startResultsDisplay(const std::vector<int>& scores);
     void onSelectClick();
     void lClick();
     void rClick();
     void configureLayout();
     bool isCarouselAnimating() const;
+    void resetToLevelSelect();
 
     unique_ptr<Minigame> currentMinigame;
     SDLState& state;
@@ -41,8 +44,6 @@ private:
     ImageButton selectButton;
 	ImageButton leftButton;
 	ImageButton rightButton;
-
-    ImageButton cardIll;
 
     SDL_Texture* leftTexture = nullptr;
     SDL_Texture* rightTexture = nullptr;
@@ -72,3 +73,9 @@ private:
     float buttonFade = 0.0f;
 };
 
+    // Results handling
+    bool showingResults = false;
+    uint64_t resultsStartTick = 0;
+    const uint64_t RESULTS_DURATION_MS = 3000;
+    std::vector<int> resultScores;
+};

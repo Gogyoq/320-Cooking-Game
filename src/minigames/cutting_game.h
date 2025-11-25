@@ -17,6 +17,8 @@ public:
 	void update() override;
 	void handleEvent(const SDL_Event& event) override;
 	bool isComplete() const override;
+	int getScore() const {return step.score;}
+
 
 private:
 	void spaceRectangles();

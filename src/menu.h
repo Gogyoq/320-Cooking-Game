@@ -4,7 +4,7 @@
 #include <string>
 #include <functional>
 #include "button.h"
-#include "../image_button.h"
+#include "image_button.h"
 #include "data_structs.h"
 
 using namespace std;
