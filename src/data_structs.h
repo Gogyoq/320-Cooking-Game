@@ -20,6 +20,7 @@ struct SDLState {
     SDL_Renderer* renderer = nullptr;
     GameState gameState = GameState::MAIN_MENU;
     TTF_Font* font = nullptr;
+    TTF_Font* fontSmall = nullptr;
     int width = 1600;
     int height = 900;
     int logW = 800;

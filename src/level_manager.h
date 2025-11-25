@@ -52,6 +52,8 @@ private:
     SDL_Texture* ill_cracking = nullptr;
     SDL_Texture* ill_mixing = nullptr;
     SDL_Texture* ill_cutting = nullptr;
+    SDL_Texture* ill_infinity_cracking = nullptr;
+    SDL_Texture* ill_multiple = nullptr;
 
     // Layout / assets
     void loadTextures();
@@ -63,5 +65,10 @@ private:
     const float SCROLL_SPEED = 0.15f;    // Interpolation speed (0.0-1.0)
     const float CARD_WIDTH = 300.0f;
     const float CARD_SPACING = 50.0f;
+    
+    // Fade-in animation for select button attempt
+    uint32_t buttonFadeStartTick = 0;
+    const uint32_t BUTTON_FADE_DURATION_MS = 500;  // 500ms fade-in
+    float buttonFade = 0.0f;
 };
 

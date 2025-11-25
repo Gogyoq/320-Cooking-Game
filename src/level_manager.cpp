@@ -1,5 +1,6 @@
 #include <vector>
 #include <memory>
+#include <sstream>
 #include "level_manager.h"
 #include "minigames/minigame.h"
 #include "minigames/cutting_game.h"
@@ -17,8 +18,8 @@ LevelManager::LevelManager(SDLState& state)
     recipeFinished(false), playStartAnimation(false), playFinishAnimation(false),
   selectButton(300, 320, 200, 100, "Select","", [this]() { onSelectClick(); }),
   rightButton(10, 100, 60, 60, "Settings", "", [this]() { lClick(); }),
-  leftButton(10, 10, 60, 60, "Settings", "", [this]() { rClick(); })
-    
+  leftButton(10, 10, 60, 60, "Settings", "", [this]() { rClick(); }),
+    cardIll(10, 10, 60, 60, "Settings", "", [this]() { rClick(); })
   
 {
     //Load all available recipes
@@ -36,6 +37,14 @@ void LevelManager::loadTextures() {
     leftButton.setTexture(leftTexture);
     rightButton.setTexture(rightTexture);
     selectButton.setTexture(selectTexture);
+    
+    // Load card illustration textures
+    ill_cooking = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/cooking_i.PNG");
+    ill_cracking = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/cracking_i.PNG");
+    ill_mixing = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/mixing_i.PNG");
+    ill_cutting = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/cutting_i.PNG");
+    ill_infinity_cracking = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/endless_i.PNG");
+    ill_multiple = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/multiple_i.PNG");
 }
 
 void LevelManager::cleanupTextures() {
@@ -46,6 +55,20 @@ void LevelManager::cleanupTextures() {
     leftTexture = nullptr;
     rightTexture = nullptr;
     selectTexture = nullptr;
+    
+    if (ill_cooking) SDL_DestroyTexture(ill_cooking);
+    if (ill_cracking) SDL_DestroyTexture(ill_cracking);
+    if (ill_mixing) SDL_DestroyTexture(ill_mixing);
+    if (ill_cutting) SDL_DestroyTexture(ill_cutting);
+    if (ill_infinity_cracking) SDL_DestroyTexture(ill_infinity_cracking);
+    if (ill_multiple) SDL_DestroyTexture(ill_multiple);
+    
+    ill_cooking = nullptr;
+    ill_cracking = nullptr;
+    ill_mixing = nullptr;
+    ill_cutting = nullptr;
+    ill_infinity_cracking = nullptr;
+    ill_multiple = nullptr;
 }
 
 
@@ -127,39 +150,135 @@ void LevelManager::render() {
             }
             SDL_RenderFillRect(state.renderer, &cardRect);
 
-            //Render text
+            //Render text with wrapping
             string text = recipes[i].name;
             SDL_Color textColor = { 0, 0, 0, SDL_ALPHA_OPAQUE };
-            SDL_Surface* textSurface = TTF_RenderText_Solid(state.font, text.c_str(), 0, textColor);
-            if (textSurface) {
-                SDL_Texture* textTexture = SDL_CreateTextureFromSurface(state.renderer, textSurface);
-
-                if (textTexture) {
-                    float textW, textH;
-                    SDL_GetTextureSize(textTexture, &textW, &textH);
-
-                    SDL_FRect textRect = {
-                        (xPos - textW/2),
-                        (centerY - scaledHeight / 2) + 10.0f,
-                        textW,
-                        textH
-                    };
-
-                    SDL_RenderTexture(state.renderer, textTexture, nullptr, &textRect);
-                    SDL_DestroyTexture(textTexture);
+            
+            // Use smaller font for non-selected cards
+            TTF_Font* fontToUse = (i == selectedRecipeIndex) ? state.font : state.fontSmall;
+            
+            // Calculate max text width (90% of card width to leave padding)
+            float maxTextWidth = scaledWidth * 0.9f;
+            
+            // Split text into multiple lines if it exceeds max width
+            vector<string> textLines;
+            string currentLine;
+            stringstream ss(text);
+            string word;
+            
+            while (ss >> word) {
+                string testLine = currentLine.empty() ? word : currentLine + " " + word;
+                SDL_Surface* testSurface = TTF_RenderText_Blended(fontToUse, testLine.c_str(), 0, textColor);
+                if (testSurface) {
+                    float testWidth = (float)testSurface->w;
+                    SDL_DestroySurface(testSurface);
+                    
+                    if (testWidth > maxTextWidth && !currentLine.empty()) {
+                        // Line is too long, save current line and start new one
+                        textLines.push_back(currentLine);
+                        currentLine = word;
+                    } else {
+                        // Add word to current line
+                        currentLine = testLine;
+                    }
                 }
-                SDL_DestroySurface(textSurface);
+            }
+            if (!currentLine.empty()) {
+                textLines.push_back(currentLine);
+            }
+            
+            // Render each line
+            float lineHeight = 0;
+            float currentY = (centerY - scaledHeight / 2) + 30.0f;
+            
+            for (size_t lineIdx = 0; lineIdx < textLines.size(); lineIdx++) {
+                SDL_Surface* textSurface = TTF_RenderText_Blended(fontToUse, textLines[lineIdx].c_str(), 0, textColor);
+                if (textSurface) {
+                    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(state.renderer, textSurface);
+
+                    if (textTexture) {
+                        float textW, textH;
+                        SDL_GetTextureSize(textTexture, &textW, &textH);
+                        
+                        if (lineIdx == 0) {
+                            lineHeight = textH;
+                        }
+
+                        SDL_FRect textRect = {
+                            (xPos - textW/2),
+                            currentY,
+                            textW,
+                            textH
+                        };
+
+                        SDL_RenderTexture(state.renderer, textTexture, nullptr, &textRect);
+                        SDL_DestroyTexture(textTexture);
+                    }
+                    SDL_DestroySurface(textSurface);
+                    currentY += lineHeight + 2.0f; // Add spacing between lines
+                }
+            }
+            
+            // Render card illustration in the center
+            SDL_Texture* cardIllTexture = nullptr;
+            string recipeName = recipes[i].name;
+            
+            // Determine which texture to use based on recipe name
+            if (recipeName.find("Multiple") != string::npos) {
+                cardIllTexture = ill_multiple;
+            } else if (recipeName.find("Endless") != string::npos) {
+                cardIllTexture = ill_infinity_cracking;
+            } else if (recipeName.find("Frying") != string::npos) {
+                cardIllTexture = ill_cooking;
+            } else if (recipeName.find("Mixing") != string::npos) {
+                cardIllTexture = ill_mixing;
+            } else if (recipeName.find("Cutting") != string::npos) {
+                cardIllTexture = ill_cutting;
+            } else if (recipeName.find("Cracking") != string::npos) {
+                cardIllTexture = ill_cracking;
+            }
+            
+            // Render the illustrations!!!
+            if (cardIllTexture) {
+                // Illustration size depends on if card is highlighted
+                float illWidth = (i == selectedRecipeIndex) ? 400.0f: 250.0f;
+                float illHeight = (i == selectedRecipeIndex) ? 225.0f: 155.0f;
+                
+                SDL_FRect illRect = {
+                    (xPos - illWidth / 2),
+                    (centerY - scaledHeight / 2) + scaledHeight * 0.250f,
+                    illWidth,
+                    illHeight
+                };
+                
+                SDL_RenderTexture(state.renderer, cardIllTexture, nullptr, &illRect);
             }
         }//End of card render loop
 
         //Render select button if not switching cards
         if (!isCarouselAnimating()) {
+            // Update button fade-in alpha
+            uint32_t elapsedMs = SDL_GetTicks() - buttonFadeStartTick;
+            if (elapsedMs < BUTTON_FADE_DURATION_MS) {
+                buttonFade = (float)elapsedMs / (float)BUTTON_FADE_DURATION_MS;
+            } else {
+                buttonFade = 1.0f;
+            }
+            
+            // Set button opacity for rendering
+            uint8_t opacity = (uint8_t)(buttonFade * 255);
+            SDL_SetTextureAlphaMod(selectTexture, opacity);
             selectButton.render(state);
+            SDL_SetTextureAlphaMod(selectTexture, 255);  // Reset to full opacity
         }
     }
 }
 
 void LevelManager::update() {
+    // Reset button fade when carousel animation stops
+    if (!isCarouselAnimating() && buttonFadeStartTick == 0) {
+        buttonFadeStartTick = SDL_GetTicks();
+    }
     if (recipeStarted && currentMinigame != nullptr) {
         if (playStartAnimation || playFinishAnimation) {
             animationTickCounter++;
