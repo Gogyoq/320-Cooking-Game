@@ -14,9 +14,9 @@ FryingGame::FryingGame(SDLState& state, CookingStep step)
     currentTime(SDL_GetTicks()), progressTime(0),
     safeZoneSpeed(100.0f), safeZoneVX(100.0f), safeZoneVY(100.0f),
     dialAngleX(0), dialAngleY(0),
-    gameField(475, 40, 250, 250), safeZone(570, 70, 50, 50), mouseRect(570, 70, 10, 10),
-    progressBar(735, 405, 25, 0), progressBarBG(730, 40, 35, 370),
-    dialRectX(450,250,200, 200), dialRectY(550,250, 200, 200), ingrRect(160,90,230,230)
+    gameField{450, 40, 250, 250}, safeZone{570, 70, 50, 50}, mouseRect{450, 40, 10, 10},
+    progressBar{735, 405, 25, 0}, progressBarBG{730, 40, 35, 370},
+    dialRectX{525,325,60,60}, dialRectY{625,325,60,60}, ingrRect{160,90,230,230}
 {
     ingr = step.ingredients[0]; //Maybe update this to check if the array is empty later im too lazy
     loadTextures(); //Load all textures for this minigame
@@ -39,21 +39,16 @@ void FryingGame::render()
     //Render gamefield
     SDL_RenderFillRect(renderer, &gameField);
     //Render safezone
-    SDL_SetRenderDrawColor(renderer, 18, 223, 176, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 130, 170, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, &safeZone);
     //Render mouse rect
-    SDL_SetRenderDrawColor(renderer, 255, 10, 225, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 255, 170, 130, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, &mouseRect);
 
     //render the progress bar
-    // Fill
-    SDL_SetRenderDrawColor(renderer, 20, 20, 40, 200);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, &progressBarBG);
-    // Outline
-    SDL_SetRenderDrawColor(renderer, 220, 220, 240, SDL_ALPHA_OPAQUE);
-    SDL_RenderRect(renderer, &progressBarBG);
-
-    SDL_SetRenderDrawColor(renderer, 255, 10, 225, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 255, 170, 130, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, &progressBar);
 
     //Render dials
@@ -213,10 +208,10 @@ void FryingGame::updateDials()
     relativeX = std::max(-1.0f, std::min(1.0f, relativeX));
     relativeY = std::max(-1.0f, std::min(1.0f, relativeY));
 
-    // Map to dial angles (-90° to +90°)
-    // relativeX = -1.0 (left edge) -> -90°
-    // relativeX =  0.0 (center)    ->   0°
-    // relativeX = +1.0 (right edge)-> +90°
+    // Map to dial angles (-90ï¿½ to +90ï¿½)
+    // relativeX = -1.0 (left edge) -> -90ï¿½
+    // relativeX =  0.0 (center)    ->   0ï¿½
+    // relativeX = +1.0 (right edge)-> +90ï¿½
     dialAngleX = relativeX * 90.0;
     dialAngleY = relativeY * 90.0;
 }

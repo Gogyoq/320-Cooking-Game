@@ -15,10 +15,42 @@ using namespace std;
 LevelManager::LevelManager(SDLState& state)
     : state(state), currentMinigame(nullptr), recipeStarted(false),
     recipeFinished(false), playStartAnimation(false), playFinishAnimation(false),
-  selectButton(300, 320, 200, 60, "Select", [this]() { onSelectClick(); })
+  selectButton(300, 320, 200, 100, "Select","", [this]() { onSelectClick(); }),
+  rightButton(10, 100, 60, 60, "Settings", "", [this]() { lClick(); }),
+  leftButton(10, 10, 60, 60, "Settings", "", [this]() { rClick(); })
+    
+  
 {
     //Load all available recipes
+    loadTextures();
+    configureLayout();
     loadRecipes();
+}
+void LevelManager::loadTextures() {
+    // Load button textures
+    rightTexture = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/hand_r.PNG");
+    leftTexture = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/hand_l.PNG");
+    selectTexture = IMG_LoadTexture(state.renderer, "src/res/sprites/menu_graph/select.PNG");
+
+    // Set loaded textures to image buttons
+    leftButton.setTexture(leftTexture);
+    rightButton.setTexture(rightTexture);
+    selectButton.setTexture(selectTexture);
+}
+
+void LevelManager::cleanupTextures() {
+    if (rightTexture) SDL_DestroyTexture(rightTexture);
+    if (leftTexture) SDL_DestroyTexture(leftTexture);
+    if (selectTexture) SDL_DestroyTexture(selectTexture);
+
+    leftTexture = nullptr;
+    rightTexture = nullptr;
+    selectTexture = nullptr;
+}
+
+
+void LevelManager::configureLayout() {
+    // No further layout changes are needed since buttons are already configured in their constructors
 }
 
 void LevelManager::render() {
@@ -54,7 +86,7 @@ void LevelManager::render() {
     }
     else { //Render the level select screen
         // Set background color
-        SDL_SetRenderDrawColor(state.renderer, 40, 40, 60, 255);
+        SDL_SetRenderDrawColor(state.renderer, 21, 34, 31, 1);
         SDL_RenderClear(state.renderer);
 
         //Find center of screen
@@ -88,10 +120,10 @@ void LevelManager::render() {
 
             // Highlight selected card
             if (i == selectedRecipeIndex) {
-                SDL_SetRenderDrawColor(state.renderer, 100, 200, 255, 255);
+                SDL_SetRenderDrawColor(state.renderer, 66, 105, 90, 1);
             }
             else {
-                SDL_SetRenderDrawColor(state.renderer, 80, 80, 100, 255);
+                SDL_SetRenderDrawColor(state.renderer, 23, 46, 42, 1);
             }
             SDL_RenderFillRect(state.renderer, &cardRect);
 
@@ -189,6 +221,7 @@ void LevelManager::handleEvent(const SDL_Event& event) {
                 state.gameState = GameState::MAIN_MENU;
                 break;
             }
+
 
         }
         // Handle mouse wheel scrolling
@@ -357,6 +390,25 @@ void LevelManager::onSelectClick()
     currentRecipe = &recipes[selectedRecipeIndex];
     advanceStep();
 }
+
+void LevelManager::lClick()
+{
+    cout << "Left Button Clicked!" << endl;
+    if (selectedRecipeIndex > 0) {
+        selectedRecipeIndex--;
+        targetScrollPosition = selectedRecipeIndex * (CARD_WIDTH + CARD_SPACING);
+    }
+
+}
+void LevelManager::rClick()
+{
+    cout << "Right Button Clicked!" << endl;
+    if (selectedRecipeIndex < recipes.size() - 1) {
+        selectedRecipeIndex++;
+        targetScrollPosition = selectedRecipeIndex * (CARD_WIDTH + CARD_SPACING); 
+    }
+}
+
 
 bool LevelManager::isCarouselAnimating() const
 {

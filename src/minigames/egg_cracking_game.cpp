@@ -79,29 +79,29 @@ void EggCrackingGame::configureLayout() {
     markerRect.y = barRect.y - 4.0f; // centered vertically over bar
 
     // Bowl somewhere under the hand
-    float bowlWidth  = screenW * 0.20f;
+    float bowlWidth  = screenW * 0.40f;
     float bowlHeight = bowlWidth * 0.6f;
     bowlRect.w = bowlWidth;
     bowlRect.h = bowlHeight;
     bowlRect.x = (screenW - bowlWidth) / 2.0f;
-    bowlRect.y = screenH * 0.55f;
+    bowlRect.y = screenH * 0.35f;
 
     // Hand idle / crack poses
-    float handWidth  = bowlWidth * 1.1f;
-    float handHeight = handWidth * 0.9f;
+    float handWidth = bowlWidth * 0.9f;
+    float handHeight = handWidth * 0.7f;
 
     handIdlePos.w = handWidth;
     handIdlePos.h = handHeight;
     handIdlePos.x = bowlRect.x + bowlRect.w * 0.05f;
-    handIdlePos.y = bowlRect.y - handHeight - 5.0f; // above bowl
+    handIdlePos.y = bowlRect.y - handHeight - 10.0f; // above bowl
 
     handCrackPos  = handIdlePos;
-    handCrackPos.y = bowlRect.y - handHeight * 0.35f; // lower, at rim
+    handCrackPos.y = bowlRect.y - handHeight * 0.45f; // lower, at rim
 
     handRect = handIdlePos;
 
     // Yolk starts above bowl, falls into it (feature currently disabled but kept)
-    yolkRect.w = bowlWidth * 0.25f;
+    yolkRect.w = bowlWidth * 0.2f;
     yolkRect.h = yolkRect.w * 0.7f;
     yolkRect.x = bowlRect.x + (bowlRect.w - yolkRect.w) / 2.0f;
     yolkRect.y = handCrackPos.y + handCrackPos.h * 0.4f;
@@ -408,7 +408,7 @@ void EggCrackingGame::handleSpacePress() {
         fb.rect.y = barRect.y - 4.0f;  // centered on bar
 
         if (hitZone) {
-            fb.color = SDL_Color{255, 105, 180, 220};  // pink for good (temporary colours)
+            fb.color = SDL_Color{ 255, 10, 225, SDL_ALPHA_OPAQUE};  // pink for good (temporary colours)
         } else {
             fb.color = SDL_Color{255, 80, 80, 220};    // red for miss
         }

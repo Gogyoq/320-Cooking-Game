@@ -2,6 +2,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <SDL3_image/SDL_image.h>
 #include <iostream>
+#include <algorithm> 
 #include <string>
 #include "frying_game.h"
 #include "minigame.h"
