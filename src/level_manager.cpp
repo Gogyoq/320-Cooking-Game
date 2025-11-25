@@ -373,7 +373,7 @@ void LevelManager::advanceStep()
 void LevelManager::loadRecipes() {
     //Test Frying Recipe
     Recipe fryingTest;
-    fryingTest.name = "Frying Test";
+    fryingTest.name = "Frying";
     fryingTest.difficulty = 1;
     fryingTest.description = "Test recipe for Frying minigame";
 
@@ -396,7 +396,7 @@ void LevelManager::loadRecipes() {
 
     //Test Frying Recipe
     Recipe mixingTest;
-    mixingTest.name = "Mixing Test";
+    mixingTest.name = "Mixing";
     mixingTest.difficulty = 1;
     mixingTest.description = "Test recipe for Mixing minigame";
 
@@ -414,7 +414,7 @@ void LevelManager::loadRecipes() {
     //Replace later with JSON recipe loading 
     //Test recipe for cutting minigame
     Recipe cuttingTest;
-    cuttingTest.name = "Cutting Test";
+    cuttingTest.name = "Cutting";
     cuttingTest.difficulty = 1;
     cuttingTest.description = "Test recipe for Cutting minigame";
 
@@ -430,7 +430,7 @@ void LevelManager::loadRecipes() {
     recipes.push_back(cuttingTest);
 
     Recipe eggTest;
-    eggTest.name = "Egg Cracking Test";
+    eggTest.name = "Egg Cracking";
     eggTest.difficulty = 1;
     eggTest.description = "Test recipe for Egg Cracking minigame";
 
@@ -452,7 +452,7 @@ void LevelManager::loadRecipes() {
 
         // Endless Egg Cracking test recipe
     Recipe eggEndless;
-    eggEndless.name = "Endless Egg Test";
+    eggEndless.name = "Endless Egg!";
     eggEndless.difficulty = 2;
     eggEndless.description = "Endless egg timing — gets faster until you miss.";
 
@@ -467,12 +467,14 @@ void LevelManager::loadRecipes() {
     recipes.push_back(eggEndless);
 
     Recipe multipleTest;
-    multipleTest.name = "Multiple Minigames Test";
+    multipleTest.name = "Multiple Minigames";
     multipleTest.difficulty = 1;
     multipleTest.description = "Test recipe for chaining minigames";
 
     multipleTest.steps.push_back(cut);
     multipleTest.steps.push_back(fry);
+    multipleTest.steps.push_back(mix);
+    multipleTest.steps.push_back(crackStep);
     recipes.push_back(multipleTest);
 }
 
