@@ -13,7 +13,7 @@ using namespace std;
 //Cutting Minigame Implementation
 CuttingGame::CuttingGame(SDLState& state, CookingStep step)
     : state(state), step(step), isClicked(false),
-    onCooldown(false), clickTime(SDL_GetTicks())
+    onCooldown(false), clickTime(SDL_GetTicks()), cutsMade(0)
 {
     ingr = step.ingredients[0]; //Maybe update this to check if the array is empty later im too lazy
 
@@ -24,7 +24,7 @@ CuttingGame::CuttingGame(SDLState& state, CookingStep step)
     progressBarBG = { .x = 95, .y = 345, .w = 610, .h = 35 };
     Rectangles initRect{
         .destRect = {.x = 200, .y = 165, .w = 400, .h = 200 },
-        .sourceRect = {.x = 0, .y = 0, .w = (float)textures[ingr.name]->w, .h = (float)textures[ingr.name]->h}
+        .sourceRect = {.x = 0, .y = 0, .w = static_cast<float>(textures[ingr.name]->w), .h = static_cast<float>(textures[ingr.name]->h)}
     };
     ingrRects.push_back(initRect);
 }
@@ -89,7 +89,7 @@ void CuttingGame::update() {
         onClick();
     }
 
-    if (onCooldown && SDL_GetTicks() - clickTime >= cooldownDuration) {
+    if (onCooldown && SDL_GetTicks() - clickTime >= static_cast<uint32_t>(cooldownDuration)) {
         // Cooldown is over
         onCooldown = false;
     }
@@ -243,8 +243,8 @@ void CuttingGame::spaceRectangles() {
 //Update progress based on cuts remaining
 void CuttingGame::updateProgress()
 {
-    int totalWidth = progressBarBG.w - 10.0;
-    progressBar.w = totalWidth * (cutsMade / step.duration);
+    float totalWidth = progressBarBG.w - 10.0f;
+    progressBar.w = totalWidth * (static_cast<float>(cutsMade) / step.duration);
 }
 
 //Helper function to get ingredient file path, important that we follow filename conventions

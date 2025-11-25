@@ -47,7 +47,7 @@ private:
     struct HitFeedback {
         SDL_FRect rect;
         SDL_Color color;
-        uint32_t spawnTime;
+        uint64_t spawnTime;
         uint32_t lifetimeMs;
     };
 
@@ -78,10 +78,10 @@ private:
     uint32_t countdownDurationMs = 1000; // 1 second
     uint32_t resultDurationMs = 900;  // per-egg result overlay display
 
-    uint32_t countdownStartTick = 0;
-    uint32_t passStartTick = 0;
-    uint32_t resultStartTick = 0;
-    uint32_t crackAnimStartMs = 0;
+    uint64_t countdownStartTick = 0;
+    uint64_t passStartTick = 0;
+    uint64_t resultStartTick = 0;
+    uint64_t crackAnimStartMs = 0;
 
     // Layout rects
     SDL_FRect barRect{};
@@ -129,7 +129,7 @@ private:
 
     // Logic
     void updateCrackAnimation(uint64_t now);
-    void updateHitFeedbacks(uint32_t now);
+    void updateHitFeedbacks(uint64_t now);
     void handleSpacePress();
     bool markerInZone(int zoneIndex) const;
 

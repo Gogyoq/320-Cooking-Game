@@ -306,7 +306,7 @@ void EggCrackingGame::update() {
     }
 }
 
-void EggCrackingGame::updateHitFeedbacks(uint32_t now) {
+void EggCrackingGame::updateHitFeedbacks(uint64_t now) {
     // Remove any feedback whose lifetime has expired
     auto it = std::remove_if(
         hitFeedbacks.begin(),
@@ -560,10 +560,10 @@ void EggCrackingGame::renderMarker() {
 
 void EggCrackingGame::renderHitFeedback() {
     SDL_Renderer* renderer = state.renderer;
-    uint32_t now = SDL_GetTicks();
+    uint64_t now = SDL_GetTicks();
 
     for (const auto& fb : hitFeedbacks) {
-        uint32_t age = now - fb.spawnTime;
+        uint64_t age = now - fb.spawnTime;
         if (age >= fb.lifetimeMs) continue;
 
         float t = age / static_cast<float>(fb.lifetimeMs); // 0 to 1

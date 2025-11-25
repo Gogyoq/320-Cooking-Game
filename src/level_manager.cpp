@@ -17,12 +17,9 @@ using namespace std;
 LevelManager::LevelManager(SDLState& state)
     : state(state), currentMinigame(nullptr), recipeStarted(false),
     recipeFinished(false), playStartAnimation(false), playFinishAnimation(false),
-  selectButton(300, 320, 200, 100, "Select","", [this]() { onSelectClick(); }),
-  rightButton(10, 100, 60, 60, "Settings", "", [this]() { lClick(); }),
-  leftButton(10, 10, 60, 60, "Settings", "", [this]() { rClick(); }),
-    cardIll(10, 10, 60, 60, "Settings", "", [this]() { rClick(); })
-  
-  leftButton(10, 10, 60, 60, "Settings", "", [this]() { rClick(); })
+    selectButton(300, 320, 200, 100, "Select", "", [this]() { onSelectClick(); }),
+    rightButton(10, 100, 60, 60, "Settings", "", [this]() { lClick(); }),
+    leftButton(10, 10, 60, 60, "Settings", "", [this]() { rClick(); })
 {
     //Load all available recipes
     loadTextures();
@@ -96,12 +93,12 @@ void LevelManager::render() {
                 if (textTexture) {
                     float textW, textH;
                     SDL_GetTextureSize(textTexture, &textW, &textH);
-                    textW = textW * 4;
-                    textH = textH * 4;
+                    textW = textW * 4.0f;
+                    textH = textH * 4.0f;
                     // Center the text on screen
                     SDL_FRect textRect = {
-                        (state.logW - textW) / 2,
-                        (state.logH - textH) / 2,
+                        (state.logW - textW) / 2.0f,
+                        (state.logH - textH) / 2.0f,
                         textW,
                         textH
                     };
@@ -264,9 +261,9 @@ void LevelManager::render() {
         //Render select button if not switching cards
         if (!isCarouselAnimating()) {
             // Update button fade-in alpha
-            uint32_t elapsedMs = SDL_GetTicks() - buttonFadeStartTick;
+            uint64_t elapsedMs = SDL_GetTicks() - buttonFadeStartTick;
             if (elapsedMs < BUTTON_FADE_DURATION_MS) {
-                buttonFade = (float)elapsedMs / (float)BUTTON_FADE_DURATION_MS;
+                buttonFade = static_cast<float>(elapsedMs) / static_cast<float>(BUTTON_FADE_DURATION_MS);
             } else {
                 buttonFade = 1.0f;
             }

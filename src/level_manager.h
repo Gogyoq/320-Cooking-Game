@@ -68,10 +68,9 @@ private:
     const float CARD_SPACING = 50.0f;
     
     // Fade-in animation for select button attempt
-    uint32_t buttonFadeStartTick = 0;
+    uint64_t buttonFadeStartTick = 0;
     const uint32_t BUTTON_FADE_DURATION_MS = 500;  // 500ms fade-in
     float buttonFade = 0.0f;
-};
 
     // Results handling
     bool showingResults = false;
